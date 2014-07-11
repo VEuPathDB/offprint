@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if [[ ! "$1" =~ userdb|appdb ]]; then
+  echo "Usage: $this [userdb|appdb]"
+  exit 1
+fi
+
+ORACLE_SID=$1
+ORACLE_SID_UC="$(echo $ORACLE_SID | tr '[:lower:]' '[:upper:]')"
+SYS_PASSWORD=$2
+export ORACLE_SID
+
+sudo su - oracle -c "ORACLE_SID=$ORACLE_SID; echo 'SHUTDOWN ABORT;'  | sqlplus / as sysdba"
+sudo su - oracle -c "ORACLE_SID=$ORACLE_SID; $ORACLE_HOME/bin/emctl stop dbconsole"
+
+sudo rm -f ${ORACLE_HOME}/dbs/*"${ORACLE_SID}"* 
+sudo rm -f ${ORACLE_HOME}/dbs/"lk${ORACLE_SID_UC}" 
+sudo rm -f /u02/oradata/"${ORACLE_SID}"/*{.log,.dbf,.ctl}
+sudo rm -rf /u01/app/oracle/diag/rdbms/"${ORACLE_SID}"
+sudo rm -rf "/u01/app/oracle/admin/${ORACLE_SID}"
+sudo rm -rf "${ORACLE_HOME}/localhost_${ORACLE_SID}"
+sudo rm -f "${ORACLE_HOME}/rdbms/audit/${ORACLE_SID}"*.aud
+sudo rm -rf "/u01/app/oracle/cfgtoollogs/emca/${ORACLE_SID}"
+sudo rm -rf "/u01/app/oracle/cfgtoollogs/dbca/${ORACLE_SID}"
+sudo rm -rf "/u01/app/oracle/product/11.2.0.3/db_1/oc4j/j2ee/OC4J_DBConsole_localhost_${ORACLE_SID}/"
+sudo rm -f "/dev/shm/ora_${ORACLE_SID}_"*
+
+sudo ed -s /etc/oratab <<EOF
+/${ORACLE_SID}/
+d
+w
+q
+EOF
+
+sudo su - oracle -c "pkill -9 -U oracle -f '[o]ra.*${ORACLE_SID}'"
+

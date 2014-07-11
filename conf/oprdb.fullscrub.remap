@@ -1,0 +1,4 @@
+remap_data=%%user_schema%%.users.passwd:system.vm_impdp_remap.sanitize_userlogins_password
+remap_data=%%user_schema%%.users.email:system.vm_impdp_remap.sanitize_userlogins_email
+remap_data=%%user_schema%%.users.address:system.vm_impdp_remap.sanitize_userlogins_address
+remap_data=%%user_schema%%.users.phone_number:system.vm_impdp_remap.sanitize_userlogins_phone

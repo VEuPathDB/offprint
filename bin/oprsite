@@ -1,0 +1,88 @@
+#!/bin/bash
+# offprint website
+
+set -u
+set -x
+
+this="$(basename $0)"
+export Bin=$(dirname $(readlink -f $0))
+
+if [[ -f "${Bin}/oprsite_functions.sh" ]]; then
+  source "${Bin}/oprsite_functions.sh"
+else
+  echo "FATAL: ${Bin}/oprsite_functions.sh not found. Exiting..."
+fi
+
+exec > >(tee "${OPR_WD}/${this}.$(date +"%m-%d-%Y--%H-%m").log") 2>&1
+echo $this :: $(date)
+
+source "${OPR_CONF}"
+
+(startup_checks  "$@") || exit $?
+
+readonly SOURCE_WEBSITE=$1
+
+(write_env_dot_file "$SOURCE_WEBSITE" "$CFG_VMENV_FILE")
+
+source $CFG_VMENV_FILE 2>/dev/null || { stat=$?; echo "FATAL: ${CFG_VMENV_FILE} profile appears invalid."; exit $stat; }
+
+sudo sed -i "/127.0.0.1 ${HOST}/d" /etc/hosts || errexit
+sudo /bin/sh -c "echo '127.0.0.1 ${HOST}' >> /etc/hosts" || errexit
+sudo sed -i "s|HOSTNAME=.*|HOSTNAME=${HOST}|" /etc/sysconfig/network  || errexit
+sudo hostname $HOST  || errexit
+
+sudo rm -rf "/var/www/${PRODUCT}/${WEBAPP}"
+
+sudo mkdir -p "/var/www/${PRODUCT}"
+sudo chmod 0777 "/var/www/${PRODUCT}"
+
+if ! rpm -q "tomcat-instance-${PRODUCT}" >/dev/null; then
+  sudo yum clean all
+  sudo yum install -y "tomcat-instance-${PRODUCT}"
+  sudo /bin/cp "${ORACLE_HOME}/jdbc/lib/ojdbc6.jar" "/usr/local/tomcat_instances/${PRODUCT}/shared/lib/"
+  sudo instance_manager start $PRODUCT
+fi
+
+cd ~
+rm -f installWdkSite*.prop
+set +e; echo y | installWdkSite >/dev/null 2>&1; set -e;
+iws-proper installWdkSite_*.prop "$HOST/$WEBAPP"
+
+echo y | installWdkSite installWdkSite_*.prop
+
+# append to the setenv file that installWdkSite created
+sudo -u joeuser /bin/sh -c "cat >> '/var/www/$HOST/etc/setenv'" <<EOF
+export PRODUCT=$PRODUCT
+export HOST=$HOST
+export WEBAPP=$WEBAPP
+export RELEASE_NUMBER=$RELEASE_NUMBER
+export BUILD_NUMBER=$BUILD_NUMBER
+EOF
+
+grep -q removePassword /etc/httpd/conf/enabled_sites/$HOST.conf || \
+  sed -i "s:</VirtualHost>:<Perl>\n  require 'conf/lib/Publish.pm';\n  removePassword();\n</Perl>\n\n</VirtualHost>:" /etc/httpd/conf/enabled_sites/$HOST.conf
+
+sudo service httpd reload || errexit
+
+
+sudo -u joeuser /bin/sh -c "cat > ~/.euparc" <<EOF
+<?xml version="1.0" encoding="utf-8"?>
+<euparc>
+  <database>
+    <user login='${CFG_WDK_USER_LOGIN}' password='${CFG_WDK_USER_PASSWORD}' />
+  </database>
+</euparc>
+EOF
+
+
+
+sudo -u joeuser /bin/sh -c "cat > '/var/www/${PRODUCT}/${WEBAPP}/etc/master_configuration_set'" <<EOF
+$HOST appdb  userdb ${CFG_WDK_USER_LOGIN}  ${CFG_WDK_USER_LOGIN}
+EOF
+
+sudo su - joeuser <<EOF
+source "/var/www/${PRODUCT}/${WEBAPP}/etc/setenv"
+cd \$PROJECT_HOME
+curl -sL "http://${SOURCE_WEBSITE}/dashboard/xml/svn/checkout/value" | /bin/sh
+rebuilder $HOST --use-configula --non-interactive --skip-svn-update
+EOF

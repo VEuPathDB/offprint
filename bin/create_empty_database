@@ -1,0 +1,61 @@
+#!/bin/sh
+
+# This script must be run as oracle user
+
+this="$(basename $0)"
+Bin=$(dirname $(readlink -f $0))
+
+if [[ -f "${Bin}/oprdb_functions.sh" ]]; then
+  source "${Bin}/oprdb_functions.sh"
+else
+  echo "FATAL: ${Bin}/oprdb_functions.sh not found. Exiting..."
+fi
+
+if [[ "$USER" != "oracle" ]]; then
+  errexit "This script must be run as the oracle user."
+fi
+
+
+if [[ ! "$1" =~ userdb|appdb ]]; then
+  echo "Usage: $this [userdb|appdb]"
+  exit 1
+fi
+
+
+ORACLE_SID=$1
+SYS_PASSWORD=$2
+export ORACLE_SID
+
+if [[ "$(find /u02/oradata/${ORACLE_SID}/ -maxdepth 1 -name '*.dbf')" ]]; then
+  errexit "dbf files exist in /u02/oradata/${ORACLE_SID}. Perhaps you need to drop an exsiting database?";
+fi
+
+OLD_UMASK=`umask`
+umask 0027
+mkdir -p /u01/app/oracle/admin/${ORACLE_SID}/adump
+mkdir -p /u01/app/oracle/admin/${ORACLE_SID}/dpdump
+mkdir -p /u01/app/oracle/admin/${ORACLE_SID}/pfile
+mkdir -p /u01/app/oracle/admin/${ORACLE_SID}/log
+mkdir -p /u01/app/oracle/cfgtoollogs/dbca/${ORACLE_SID}
+mkdir -p /u01/app/oracle/product/11.2.0.3/db_1/dbs
+mkdir -p /u02/oradata/${ORACLE_SID}
+umask ${OLD_UMASK}
+ORACLE_SID=${ORACLE_SID}; export ORACLE_SID
+PATH=$ORACLE_HOME/bin:$PATH; export PATH
+
+ed -s /etc/oratab <<EOF
+/${ORACLE_SID}/
+d
+w
+q
+EOF
+
+/bin/sh -c "echo '${ORACLE_SID}:${ORACLE_HOME}:Y' >> /etc/oratab"
+
+#echo "${OPR_HOME}/lib/sql/dbsetup/dbcreate.sql" "${OPR_HOME}/lib/sql/dbsetup" "${SYS_PASSWORD}" "${ORACLE_SID}"
+
+/u01/app/oracle/product/11.2.0.3/db_1/bin/sqlplus -S /nolog <<EOF
+WHENEVER OSERROR EXIT FAILURE
+@"${OPR_HOME}/lib/sql/dbsetup/dbcreate.sql" "${OPR_HOME}/lib/sql/dbsetup" "${SYS_PASSWORD}" "${ORACLE_SID}"
+EOF
+

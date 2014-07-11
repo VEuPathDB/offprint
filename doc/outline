@@ -1,0 +1,35 @@
+
+
+User-executable command nams are prefaced with 'opr'. Helper scripts are not.
+
+/opt/opr/ (override with OPR_HOME env)
+  etc/
+  bin/
+
+
+
+Usage
+
+oprdb - makes offprint of website databases
+  oprdb toxodb.org
+    makes offprint of application and user databases
+  Options:
+    --only-userdb
+      make offprint of user database
+    --only-appdb
+      make offprint of application database
+    --skip-scrub
+      make exact offprint, do not remap data
+        Use this option for internally hosted sites, say for public access to previous releases.
+        The default is to scrub sensitive data like passwords and contact information.
+  
+  
+oprdb makes http requests to the source website /dashboard to learn the connection string of the application and user databases. 
+
+Network links are created in the destination databases using the full connection descriptor, (DESCRIPTION=...(HOST=...)) . Using the explicit descriptor instead of tns names or aliases avoids ambiguity (e.g. 'apicommS' resolves to different databases on the source and destination servers).
+
+
+
+
+
+oprw - make offprint of EuPathDB WDK-based component website. (Not suited for portal, not OrthoMCL)

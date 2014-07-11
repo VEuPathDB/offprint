@@ -1,0 +1,18 @@
+#!/bin/bash
+
+this="$(basename $0)"
+Bin=$(dirname $(readlink -f $0))
+
+if [[ -f "${Bin}/oprcommon_functions.sh" ]]; then
+  source "${Bin}/oprcommon_functions.sh"
+else
+  echo "FATAL: ${Bin}/oprcommon_functions.sh not found. Exiting..."
+fi
+
+readonly SOURCE_WEBSITE="$1"
+
+oprdb "${SOURCE_WEBSITE}" 
+
+oprsite "${SOURCE_WEBSITE}"
+
+oprdatafiles "${SOURCE_WEBSITE}"

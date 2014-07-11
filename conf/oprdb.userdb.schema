@@ -1,0 +1,15 @@
+# legacy
+TOXOCOMM
+
+# login accounts
+APICOMM_DBLINK
+
+# core application
+ANNOUNCE
+APIDB
+APIDB_R 
+UPLOADS
+WDKENGINE
+GBROWSEUSERS
+
+%%user_schema%%

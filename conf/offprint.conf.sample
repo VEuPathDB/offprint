@@ -1,0 +1,78 @@
+# Configuration for offprint.
+# Use bash profile syntax (it will be sourced).
+
+#
+# OS user login on the source web server. This user will be used
+# to rsync data from the source web server to the virtual machine.
+# ssh key agent forwarding is required when logging into the virtual 
+# machine so rsync can connect to the source web server.
+#
+RSYNC_USER=mheiges
+
+# Account in source databases with EXP_FULL_DATABASE role.
+# This account will be used for the network link from
+# the destination to source databases.
+#
+# These credentials must pre-exist in all source databases.
+#
+CFG_SRC_DB_EXPDP_LOGIN=system
+CFG_SRC_DB_EXPDP_PASSWORD=xxxxxx
+
+
+# AppDB and UserDB credentials used by WDK.
+#
+# These credentials will be created in the destination databases.
+#
+CFG_WDK_USER_LOGIN=vmuser
+CFG_WDK_USER_PASSWORD=xxxxxx
+
+# Credentials for database link from AppDB to UserDB
+# used by the WDK.
+#
+# These credentials will be created in the destination UserDB.
+#
+CFG_WDK_USERDB_LINK_LOGIN=apicomm_dblink
+CFG_WDK_USERDB_LINK_PASSWORD=xxxxxx
+
+# Login account with system privileges for UserDB and AppDB
+# databases. This account will do receive the import, create
+# user accounts.
+# The password also apply to system, sysman, dbsnmp accounts.
+#
+# These credentials will be created all destination databases.
+#
+CFG_DEST_DB_SYS_LOGIN=system
+CFG_DEST_DB_SYS_PASSWORD=xxxxx
+
+##################################################################################
+#### Advanced - You probably do not want to change the following properties. #####
+##################################################################################
+
+DEST_DB_SYSTEM_PASSWORD=$CFG_DEST_DB_SYS_PASSWORD
+DEST_DB_SYSMAN_PASSWORD=$CFG_DEST_DB_SYS_PASSWORD
+DEST_DB_DBSNMP_PASSWORD=$CFG_DEST_DB_SYS_PASSWORD
+
+# name of database link used for expdp/impdp
+CFG_EXPDP_NETWORK_LINK=source_db
+
+# location of download data files on source website.
+# The destination directory will be created on the VM.
+CFG_DOWNLOAD_FILES_DIR=/var/www/Common/apiSiteFilesMirror/downloadSite
+
+# location of webServices data files on source website.
+# The destination directory will be created on the VM.
+CFG_WS_FILES_DIR=/var/www/Common/apiSiteFilesMirror/webServices
+
+# location of community data files (those uploaded by website users) 
+# on the source website.
+# The destination directory will be created on the VM.
+CFG_COMMUNITY_FILES_DIR=/var/www/Common/communityFilesMirror
+
+# the host for CFG_DOWNLOAD_FILES_DIR, CFG_WS_FILES_DIR, CFG_COMMUNITY_FILES_DIR
+CFG_DATAFILES_HOST=olive.rcc.uga.edu
+
+# bash shell file that sets environment variables for the
+# specific website hosted on the VM. e.g. $PRODUCT, $RELEASE_NUMBER
+CFG_VMENV_FILE=/etc/profile.d/eupath_vmenv.sh
+
+
