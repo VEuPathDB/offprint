@@ -6,6 +6,7 @@ A pipeline for making an offprint of a EuPathDB website on to a virtual applianc
 
 ### Features
 
+- Given the name of website hostname, e.g. `offprint toxodb.org`, offprint will programmatically determine the user and application databases that need to be cloned and the website source code that is required.
 - Imports, over network link, the source website's application and user databases to destination databases on the appliance. This helps ensure that the database is in sync with the website application code.
 - Website source code is checked out from SCM at the same revision as the source website. This helps ensure that the code is in sync with the databases (in particular, with the tuning tables).
 
@@ -48,6 +49,8 @@ Set env variables (optional)
 #### Individual Commands
 
 Typically you want to run `offprint` to do a complete setup but you can run individual steps if you need to patch specific components or are debugging the pipeline. Be aware that running individual steps can have unintended consequences, for example re-importing a database may result in one that is out of sync with the WDK application code.
+
+**offprint**
 
 **oprdb**
 
