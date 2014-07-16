@@ -1,2 +1,3 @@
+# rsync exclusion list
 *.bam
 *.bam.bai

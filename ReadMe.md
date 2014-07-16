@@ -44,13 +44,45 @@ Set env variables (optional)
 - OPR_WD (default: $HOME/.opr) - offprint working directory for temporary files and logs
 - OPR_CONF (default: $HOME/offprint.conf) - configuration for an offprint instance
 
-**offprint**
+Confirm the source website is online, has a functional `/dashboard` API and has the desired version of source code and database. Then run **offprint &lt;hostname&gt;**
+
+Where hostname is the source website you want to install on a virtual machine. For example,
+
+      offprint w1.amoebadb.org
+
+_Tip: For websites that multiple backends, it is best to explictly state the host that is closest to the VM; that is, use `w1.amoebadb.org` rather than `amoebadb.org` so you do not try to copy a database across a WAN._
+
+See the  __Individual Commands__  section below for running substeps of the pipeline.
+
+#### Configuration
+
+The default configuration file is `offprint.conf` in `vmbuilder`'s home directory (use `offprint/conf/offprint.conf.sample` as a starting template. The conf file is internally documented. The default file location can be changed by setting the `OPR_CONF` environment variable to a file path.
+
+Other quasi-configuration files can be found in `offprint/conf/`. These should not need to be changed very often, typically only when the database schema changes.
+
+- oprdatafiles.ws.rsync.exclude
+
+  A list of files to exclude from `apiSiteFilesMirror` during `rsync` to the VM. The file format follows `rsync --exclude-from` rules.
+
+- oprdb.appdb.schema
+
+  The list of schema to export from the source AppDB database.
+
+- oprdb.userdb.schema
+
+  The list of schema to export from the source UserDB database. `%%user_schema%%` is a macro that will be dynamically replaced with the correct value for the given website, e.g. `userlogins5`. The value is obtained by a /dashboard API query to the source website.
+
+- oprdb.fullscrub.remap
+
+  Oracle expdp remap\_data instructions. `%%user_schema%%` is a macro as described above for `oprdb.userdb.schema`. These lines will be copied into the parameter file used by `impdp`. The remapping functions are defined in `offprint/lib/sql/oprdb.userdb.functions.sql`.
+
+#### Logging
+
+STDOUT and STDERR are directed to the console and to log files in `~/.opr/`. They are named after the individual commands and timestamped.
 
 #### Individual Commands
 
-Typically you want to run `offprint` to do a complete setup but you can run individual steps if you need to patch specific components or are debugging the pipeline. Be aware that running individual steps can have unintended consequences, for example re-importing a database may result in one that is out of sync with the WDK application code.
-
-**offprint**
+Typically you want to run `offprint` to do a complete setup but you can run individual steps if you need to patch specific components or are debugging the pipeline. Be aware that running individual steps can have unintended consequences. For example, re-importing a database may result in one that is out of sync with the WDK application code.
 
 **oprdb**
 
@@ -58,7 +90,7 @@ Typically you want to run `offprint` to do a complete setup but you can run indi
 
 **oprdatafiles**
 
-### Need To Know
+### Things To Know
 
 - `offprint` installs the same revision of source code as found on the source website (as reported by the /dashboard API).
   - Therefore, committing a bug fix to the relevant branch is not sufficient for the VM to acquire that fix. You must first rebuild the source website so /dashboard reflects the correct revision.
@@ -97,3 +129,4 @@ The following is a high-level summary of what each script does.
 
   - install jolokia webapp for /dashboard
   - not exp databases if tuningManager is running
+    - block tM when offprint is running
