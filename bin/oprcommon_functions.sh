@@ -1,5 +1,5 @@
-: ${OPR_HOME:="/opt/opr"}
-: ${OPR_WD:="$HOME/.opr"}
+: ${OPR_HOME:="$HOME/offprint"}
+: ${OPR_WD:="$HOME/.offprint"}
 : ${OPR_CONF:="$HOME/offprint.conf"}
 
 function errexit {

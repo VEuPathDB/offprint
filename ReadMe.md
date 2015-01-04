@@ -40,8 +40,8 @@ The standard KVM virtual machine template includes the user 'vmbuilder' whose ho
 
 Set env variables (optional)
 
-- OPR_HOME (default: /opt/opr) - location of offprint source code
-- OPR_WD (default: $HOME/.opr) - offprint working directory for temporary files and logs
+- OPR_HOME (default: $HOME/offprint) - location of offprint source code
+- OPR_WD (default: $HOME/.offprint) - offprint working directory for temporary files and logs
 - OPR_CONF (default: $HOME/offprint.conf) - configuration for an offprint instance
 
 Confirm the source website is online, has a functional `/dashboard` API and has the desired version of source code and database. Then run **offprint &lt;hostname&gt;**

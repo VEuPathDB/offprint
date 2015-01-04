@@ -2,7 +2,7 @@
 
 User-executable command nams are prefaced with 'opr'. Helper scripts are not.
 
-/opt/opr/ (override with OPR_HOME env)
+$HOME/offprint/ (override with OPR_HOME env)
   etc/
   bin/
 
