@@ -94,7 +94,9 @@ if [[ "$SKIP_USERDB_IMP" -ne "1" ]]; then
   if [[ $SKIP_USERDB_SCRUB != 1 ]]; then
     readonly QUERY_FILTER=$( cat <<EOF
 # only keep users that own comments or public strategies
-query=${USER_SCHEMA}.users:"WHERE is_guest != 1 and user_id in (select user_id from USERLOGINS5.strategies@${CFG_EXPDP_NETWORK_LINK} where is_public = 1 UNION select user_id from USERLOGINS5.comments@${CFG_EXPDP_NETWORK_LINK})"
+query=${USER_SCHEMA}.users:"WHERE is_guest != 1 and user_id in (select user_id from ${USER_SCHEMA}.comments@source_db)"
+query=${USER_SCHEMA}.comments:"WHERE 1=1"
+query="WHERE 1=2"
 EOF
     )
   else
