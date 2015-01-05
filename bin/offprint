@@ -3,6 +3,8 @@
 this="$(basename $0)"
 Bin=$(dirname $(readlink -f $0))
 
+export PATH=$Bin:$PATH
+
 if [[ -f "${Bin}/oprcommon_functions.sh" ]]; then
   source "${Bin}/oprcommon_functions.sh"
 else
