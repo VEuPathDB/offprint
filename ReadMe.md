@@ -72,9 +72,19 @@ Other quasi-configuration files can be found in `offprint/conf/`. These should n
 
   The list of schema to export from the source UserDB database. `%%user_schema%%` is a macro that will be dynamically replaced with the correct value for the given website, e.g. `userlogins5`. The value is obtained by a /dashboard API query to the source website.
 
+- oprdb.userdb.min.exp.query
+
+  Queries used to select rows for exporting from UserDB. This is useful for creating a minimal database, devoid of sensitive data such as user profiles and passwords. 
+  
+  `%%user_schema%%` is a macro as described above for `oprdb.userdb.schema`. These lines will be copied into the parameter file used by `impdp`. See [Oracle Export documentation](http://docs.oracle.com/cd/B28359_01/server.111/b28319/dp_export.htm#i1007859) for Query syntax.
+
+- oprdb.userdb.min.exp.query
+
 - oprdb.fullscrub.remap
 
-  Oracle expdp remap\_data instructions. `%%user_schema%%` is a macro as described above for `oprdb.userdb.schema`. These lines will be copied into the parameter file used by `impdp`. The remapping functions are defined in `offprint/lib/sql/oprdb.userdb.functions.sql`.
+  Oracle expdp remap\_data instructions.
+  
+  `%%user_schema%%` is a macro as described above for `oprdb.userdb.schema`. These lines will be copied into the parameter file used by `impdp`. The remapping functions are defined in `offprint/lib/sql/oprdb.userdb.functions.sql`.
 
 #### Logging
 
@@ -129,4 +139,11 @@ The following is a high-level summary of what each script does.
 
   - install jolokia webapp for /dashboard
   - not exp databases if tuningManager is running
-    - block tM when offprint is running
+    - block tM when offprint is running    
+  - ensure dbora is running before attempting oradb script
+  - create tnsnames.ora entries if needed
+  - do we need APICOMM_DBLINK in conf/oprdb.userdb.schema?
+    - yes because it's used for the dblink
+      - CFG_WDK_USERDB_LINK_LOGIN in offprint.conf
+  - CFG_WDK_USERDB_LINK_LOGIN is not created despite what the offprint.conf indicates
+  - %%app_login_schema%% is commented out in conf/oprdb.appdb.schema, delete line if not needed

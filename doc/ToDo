@@ -1,6 +1,0 @@
-
-- ensure dbora is running before attempting oradb script
-
-- do we need APICOMM_DBLINK in conf/oprdb.userdb.schema?
-
-- %%app_login_schema%% is commented out in conf/oprdb.appdb.schema, delete line if not needed
