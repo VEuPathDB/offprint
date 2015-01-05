@@ -60,7 +60,7 @@ export BUILD_NUMBER=$BUILD_NUMBER
 EOF
 
 grep -q removePassword /etc/httpd/conf/enabled_sites/$HOST.conf || \
-  sed -i "s:</VirtualHost>:<Perl>\n  require 'conf/lib/Publish.pm';\n  removePassword();\n</Perl>\n\n</VirtualHost>:" /etc/httpd/conf/enabled_sites/$HOST.conf
+  sudo sed -i "s:</VirtualHost>:<Perl>\n  require 'conf/lib/Publish.pm';\n  removePassword();\n</Perl>\n\n</VirtualHost>:" /etc/httpd/conf/enabled_sites/$HOST.conf
 
 sudo service httpd reload || errexit
 
