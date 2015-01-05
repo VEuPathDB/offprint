@@ -81,6 +81,22 @@ function appdb_schema_list {
   echo $schemas
 }
 
+function userdb_export_queries {
+  local user_schema=$1
+  local queries='# Queries for selective row exports.'
+  while read line; do
+    line=${line%%#*}  # strip comment (if any)
+
+    local e="$line"
+    e="$(echo $e | sed "s/%%user_schema%%/$user_schema/g")"
+
+    local queries
+    queries="$(printf '%s\n%s' "$queries" "$e")"
+
+  done < "${OPR_HOME}/conf/oprdb.userdb.min.exp.query"
+  echo "$queries"
+}
+
 function full_scrub_remap {
   local user_schema=$1
   local remap='# scrub user profile data'
@@ -89,7 +105,7 @@ function full_scrub_remap {
 
     local e
     eval e="$line"
-    e="$(echo $e | sed "s/%%user_schema%%/$user_schema/")"
+    e="$(echo $e | sed "s/%%user_schema%%/$user_schema/g")"
 
     local remap
     remap="$(printf '%s\n%s' "$remap" "$e")"

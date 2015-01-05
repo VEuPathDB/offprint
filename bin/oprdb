@@ -70,6 +70,8 @@ USERDB_SCHEMAS="$(userdb_schema_list "$USER_SCHEMA")" || errexit
   readonly USERDB_SCHEMAS
 APPDB_SCHEMAS="$(appdb_schema_list "$APPDB_LOGIN_SCHEMA")" || errexit
   readonly APPDB_SCHEMAS
+USERDB_EXP_QUERIES="$(userdb_export_queries "$USER_SCHEMA")" || errexit
+  readonly USERDB_EXP_QUERIES
 FULL_SCRUB_REMAP="$(full_scrub_remap "$USER_SCHEMA")" || errexit
   readonly FULL_SCRUB_REMAP
 
@@ -92,11 +94,8 @@ if [[ "$SKIP_USERDB_IMP" -ne "1" ]]; then
   add_wdk_user ${DEST_USERDB} 'SYS' ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_WDK_USER_LOGIN} ${CFG_WDK_USER_PASSWORD}
 
   if [[ $SKIP_USERDB_SCRUB != 1 ]]; then
-    readonly QUERY_FILTER=$( cat <<EOF
-# only keep users that own comments or public strategies
-query=${USER_SCHEMA}.users:"WHERE is_guest != 1 and user_id in (select user_id from ${USER_SCHEMA}.comments@source_db)"
-query=${USER_SCHEMA}.comments:"WHERE 1=1"
-query="WHERE 1=2"
+    QUERY_FILTER=$( cat <<EOF
+${USERDB_EXP_QUERIES}
 EOF
     )
   else

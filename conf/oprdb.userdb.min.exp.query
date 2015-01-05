@@ -1,0 +1,23 @@
+
+# only keep users that own comments
+query=%%user_schema%%.users:"WHERE is_guest != 1 and user_id in (select user_id from %%user_schema%%.comments@source_db)"
+
+# retain all user comments data
+query=%%user_schema%%.COMMENTS:"WHERE 1=1"
+query=%%user_schema%%.COMMENTFILE:"WHERE 1=1"
+query=%%user_schema%%.COMMENTREFERENCE:"WHERE 1=1"
+query=%%user_schema%%.COMMENTSEQUENCE:"WHERE 1=1"
+query=%%user_schema%%.COMMENTSTABLEID:"WHERE 1=1"
+query=%%user_schema%%.COMMENTTARGETCATEGORY:"WHERE 1=1"
+query=%%user_schema%%.COMMENT_EXTERNAL_DATABASE:"WHERE 1=1"
+query=%%user_schema%%.COMMENT_TARGET:"WHERE 1=1"
+query=%%user_schema%%.EXTERNAL_DATABASES:"WHERE 1=1"
+query=%%user_schema%%.LOCATIONS:"WHERE 1=1"
+query=%%user_schema%%.REVIEW_STATUS:"WHERE 1=1"
+query=%%user_schema%%.TARGETCATEGORY:"WHERE 1=1"
+
+query=%%user_schema%%.CONFIG:"WHERE 1=1"
+
+# return 0 rows for all other tables
+query="WHERE 1=2"
+
