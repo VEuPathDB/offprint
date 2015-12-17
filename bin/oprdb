@@ -25,7 +25,7 @@ SKIP_USERDB_SCRUB=0
 SKIP_APPDB_SCRUB=0
 ARGS_NOOPTS=''
 
-source "${OPR_CONF}"
+source "${OPR_CONF}" || { echo "${OPR_CONF} not found."; exit 1; }
 
 # pick out and remove non-positional options
 until [ -z "$*" ]; do

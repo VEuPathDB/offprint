@@ -15,6 +15,16 @@ readonly SOURCE_WEBSITE="$1"
 
 oprdb "${SOURCE_WEBSITE}" 
 
+ret=$?
+echo "oprdb exited with status $ret"
+
 oprsite "${SOURCE_WEBSITE}"
 
+ret=$?
+echo "oprsite exited with status $ret"
+
 oprdatafiles "${SOURCE_WEBSITE}"
+
+ret=$?
+echo "oprdatafiles exited with status $ret"
+

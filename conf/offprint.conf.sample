@@ -44,6 +44,12 @@ CFG_WDK_USERDB_LINK_PASSWORD=xxxxxx
 CFG_DEST_DB_SYS_LOGIN=system
 CFG_DEST_DB_SYS_PASSWORD=xxxxx
 
+
+#
+# Secret string used by OAuth clients
+#
+CFG_OAUTH_CLIENT_SECRET=xxxx
+
 ##################################################################################
 #### Advanced - You probably do not want to change the following properties. #####
 ##################################################################################

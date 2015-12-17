@@ -16,7 +16,7 @@ fi
 exec > >(tee "${OPR_WD}/${this}.$(date +"%m-%d-%Y--%H-%m").log") 2>&1
 echo $this :: $(date)
 
-source "${OPR_CONF}"
+source "${OPR_CONF}" || { echo "${OPR_CONF} not found."; exit 1; }
 
 (startup_checks  "$@") || exit $?
 
@@ -71,6 +71,9 @@ sudo -u joeuser /bin/sh -c "cat > ~/.euparc" <<EOF
   <database>
     <user login='${CFG_WDK_USER_LOGIN}' password='${CFG_WDK_USER_PASSWORD}' />
   </database>
+  <oauth>
+    <client clientId='apicomponentsite' clientSecret='${CFG_OAUTH_CLIENT_SECRET}' />
+  </oauth>
 </euparc>
 EOF
 

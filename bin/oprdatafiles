@@ -18,7 +18,7 @@ fi
 exec > >(tee "${OPR_WD}/${this}.$(date +"%m-%d-%Y--%H-%m").log") 2>&1
 echo $this :: $(date)
 
-source "${OPR_CONF}"
+source "${OPR_CONF}" || { echo "${OPR_CONF} not found."; exit 1; }
 
 (startup_checks "$@") || exit $?
 
