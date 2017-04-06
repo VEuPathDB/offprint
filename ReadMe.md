@@ -29,6 +29,9 @@ A pipeline for making an offprint of a EuPathDB website on to a virtual applianc
 - The user running offprint must have root privileges in /etc/sudoers with no password, e.g.
   - `%vmbulder ALL   = (ALL) NOPASSWD:ALL`
   - See note about the `vmbuilder` user below.
+- Many steps are run as other users (oracle) and those users need to be
+able to read `offprint` files. So install offprint in a world readable
+location.
 
 #### Recommeded
 
@@ -140,8 +143,6 @@ The following is a high-level summary of what each script does.
   - install jolokia webapp for /dashboard
   - not exp databases if tuningManager is running
     - block tM when offprint is running    
-  - ensure dbora is running before attempting oradb script
-  - create tnsnames.ora entries if needed
   - do we need APICOMM_DBLINK in conf/oprdb.userdb.schema?
     - yes because it's used for the dblink
       - CFG_WDK_USERDB_LINK_LOGIN in offprint.conf
