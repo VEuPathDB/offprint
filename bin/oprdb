@@ -86,7 +86,7 @@ readonly APPDB_PAR_FILE="${OPR_WD}/appdb.par"
 if [[ "$SKIP_USERDB_IMP" -ne "1" ]]; then
 
   delete_database userdb
-  create_empty_database userdb ${CFG_DEST_DB_SYS_PASSWORD}
+  create_empty_database userdb ${DEST_DB_DOMAIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_DB_DBCA_TEMPLATE}
 
   create_import_dblink ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_USERDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
   create_userdb_functions ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_USERDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD}
@@ -150,7 +150,7 @@ fi
 if [[ "$SKIP_APPDB_IMP" -ne "1" ]]; then
 
   delete_database appdb
-  create_empty_database appdb ${CFG_DEST_DB_SYS_PASSWORD}
+  create_empty_database appdb ${DEST_DB_DOMAIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_DB_DBCA_TEMPLATE}
 
   create_import_dblink ${DEST_APPDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_APPDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
 

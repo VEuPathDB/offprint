@@ -4,30 +4,32 @@ source "${Bin}/oprcommon_functions.sh"
 function usage() {
   echo
   echo "Usage:"
-  echo "$this source_website"
+  echo "${this} source_website"
 }
 
 
 
 function delete_database {
   local dest_database="$1"
-  "${OPR_HOME}/bin/delete_database" "$dest_database"
+  sudo -u oracle -E -P "${OPR_HOME}/bin/delete_database" "${dest_database}"
 }
 
 function create_empty_database {
   local dest_database="$1"
-  local dest_passwd="$2"
-  sudo -u oracle -E -P "${OPR_HOME}/bin/create_empty_database" "$dest_database" "$dest_passwd"
+  local dest_domain="$2"
+  local dest_passwd="$3"
+  local dbca_template="$4"
+  sudo -u oracle -E -P "${OPR_HOME}/bin/create_empty_database" "${dest_database}" "${dest_domain}" "${dest_passwd}" "${dbca_template}"
 }
 
 # return first alias name found for database
 function source_db_alias {
   local source_website=$1
   local type=$2  # userdb or appdb
-  local url="http://${source_website}/dashboard/xml/wdk/databases/$type/aliases/alias/value"
+  local url="http://${source_website}/dashboard/xml/wdk/databases/${type}/aliases/alias/value"
   local dbalias
   dbalias="$(curl -L -f -s $url)" \
-    || errexit "Unable to lookup database alias from '$url'"
+    || errexit "Unable to lookup database alias from '${url}'"
   echo $dbalias
 }
 
@@ -38,12 +40,12 @@ function source_db_descriptor {
   local type=$2  # userdb or appdb
 
   local source_host_name
-  source_host_name="$(curl -L -f -s $SOURCE_WEBSITE/dashboard/xml/wdk/databases/$type/servername/value)" \
-    || errexit "Unable to lookup database host from '$url'"
+  source_host_name="$(curl -L -f -s ${SOURCE_WEBSITE}/dashboard/xml/wdk/databases/${type}/servername/value)" \
+    || errexit "Unable to lookup database host from '${url}'"
 
   local source_service_name
-  source_service_name="$(curl -L -f -s $SOURCE_WEBSITE/dashboard/xml/wdk/databases/$type/servicename/value)" \
-    || errexit "Unable to lookup database service_name from '$url'"
+  source_service_name="$(curl -L -f -s ${SOURCE_WEBSITE}/dashboard/xml/wdk/databases/${type}/servicename/value)" \
+    || errexit "Unable to lookup database service_name from '${url}'"
 
   local source_db="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=${source_host_name})(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=${source_service_name})))"
 
@@ -58,10 +60,10 @@ function userdb_schema_list {
     line=${line%%#*}  # strip comment (if any)
 
     local e
-    eval e="$line"
-    e="$(echo $e | sed s/%%user_schema%%/$user_schema/)"
+    eval e="${line}"
+    e="$(echo $e | sed s/%%user_schema%%/${user_schema}/)"
 
-    schemas="$schemas $e"
+    schemas="${schemas} $e"
   done < "${OPR_HOME}/conf/oprdb.userdb.schema"
   echo $schemas
 }
@@ -73,10 +75,10 @@ function appdb_schema_list {
     line=${line%%#*}  # strip comment (if any)
     
     local e
-    eval e="$line"
-    e="$(echo $e | sed "s/%%app_login_schema%%/$app_login_schema/" )"
+    eval e="${line}"
+    e="$(echo $e | sed "s/%%app_login_schema%%/${app_login_schema}/" )"
 
-    schemas="$schemas $e"
+    schemas="${schemas} $e"
   done < "${OPR_HOME}/conf/oprdb.appdb.schema"
   echo $schemas
 }
@@ -87,14 +89,14 @@ function userdb_export_queries {
   while read line; do
     line=${line%%#*}  # strip comment (if any)
 
-    local e="$line"
-    e="$(echo $e | sed "s/%%user_schema%%/$user_schema/g")"
+    local e="${line}"
+    e="$(echo $e | sed "s/%%user_schema%%/${user_schema}/g")"
 
     local queries
-    queries="$(printf '%s\n%s' "$queries" "$e")"
+    queries="$(printf '%s\n%s' "${queries}" "$e")"
 
   done < "${OPR_HOME}/conf/oprdb.userdb.min.exp.query"
-  echo "$queries"
+  echo "${queries}"
 }
 
 function full_scrub_remap {
@@ -104,14 +106,14 @@ function full_scrub_remap {
     line=${line%%#*}  # strip comment (if any)
 
     local e
-    eval e="$line"
-    e="$(echo $e | sed "s/%%user_schema%%/$user_schema/g")"
+    eval e="${line}"
+    e="$(echo $e | sed "s/%%user_schema%%/${user_schema}/g")"
 
     local remap
-    remap="$(printf '%s\n%s' "$remap" "$e")"
+    remap="$(printf '%s\n%s' "${remap}" "$e")"
 
   done < "${OPR_HOME}/conf/oprdb.fullscrub.remap"
-  echo "$remap"
+  echo "${remap}"
 }
 
 function app_login_schema_name {
@@ -119,8 +121,8 @@ function app_login_schema_name {
   local url="http://${source_website}/dashboard/xml/wdk/modelconfig/appdb/login/value"
 
   local app_login
-  app_login="$(curl -L -f -s $url | sed  's/\.$//')" \
-    || errexit "Unable to lookup database login from '$url'."
+  app_login="$(curl -L -f -s ${url} | sed  's/\.$//')" \
+    || errexit "Unable to lookup database login from '${url}'."
 
   echo $app_login | tr '[:lower:]' '[:upper:]'
 }
@@ -130,8 +132,8 @@ function user_schema_name {
   local url="http://${source_website}/dashboard/xml/wdk/modelconfig/userdb/userschema/value"
   
   local user_schema
-  user_schema="$(curl -L -f -s $url | sed  's/\.$//')" \
-    || errexit "Unable to lookup WDK user schema from '$url'."
+  user_schema="$(curl -L -f -s ${url} | sed  's/\.$//')" \
+    || errexit "Unable to lookup WDK user schema from '${url}'."
 
   echo $user_schema | tr '[:lower:]' '[:upper:]'
   return ${PIPESTATUS[0]}
@@ -169,9 +171,9 @@ function create_import_dblink {
   local source_account="$5"
   local source_passwd="$6"
   local link_name="$7"
-  sqlplus -S -L "$dest_account/$dest_passwd@$dest_database" <<EOF
+  sqlplus -S -L "${dest_account}/${dest_passwd}@${dest_database}" <<EOF
 WHENEVER OSERROR EXIT FAILURE
-@"${OPR_HOME}/lib/sql/oprdb.create.import.dblink.sql" "$source_database" "$source_account" "$source_passwd" "$link_name"
+@"${OPR_HOME}/lib/sql/oprdb.create.import.dblink.sql" "${source_database}" "${source_account}" "${source_passwd}" "${link_name}"
 EOF
   [[ "$?" -eq "0" ]] || errexit "Unable to create functional import link." 
 }
@@ -183,9 +185,9 @@ function create_userdb_dblink {
   local source_database="$4"
   local source_account="$5"
   local source_passwd="$6"
-  sqlplus -S -L "$dest_account/$dest_passwd@$dest_database" <<EOF
+  sqlplus -S -L "${dest_account}/${dest_passwd}@${dest_database}" <<EOF
 WHENEVER OSERROR EXIT FAILURE
-@"${OPR_HOME}/lib/sql/oprdb.create.userdb.dblink.sql" "$source_database" "$source_account" "$source_passwd"
+@"${OPR_HOME}/lib/sql/oprdb.create.userdb.dblink.sql" "${source_database}" "${source_account}" "${source_passwd}"
 EOF
   [[ "$?" -eq "0" ]] || errexit "Unable to create functional userdb link." 
 }
@@ -196,9 +198,9 @@ function drop_import_dblink {
   local dest_account="$2"
   local dest_passwd="$3"
   local link_name="$4"
-  sqlplus -S -L "$dest_account/$dest_passwd@$dest_database" <<EOF
+  sqlplus -S -L "${dest_account}/${dest_passwd}@${dest_database}" <<EOF
 WHENEVER OSERROR EXIT FAILURE
-@"${OPR_HOME}/lib/sql/oprdb.drop.import.dblink.sql" "$link_name"
+@"${OPR_HOME}/lib/sql/oprdb.drop.import.dblink.sql" "${link_name}"
 EOF
   [[ "$?" -eq "0" ]] || errexit "Unable to drop import link." 
 }
@@ -207,7 +209,7 @@ function create_userdb_functions {
   local dest_database="$1"
   local dest_account="$2"
   local dest_passwd="$3"
-  sqlplus -S -L "$dest_account/$dest_passwd@$dest_database"  <<EOF
+  sqlplus -S -L "${dest_account}/${dest_passwd}@${dest_database}"  <<EOF
 WHENEVER OSERROR EXIT FAILURE
 @"${OPR_HOME}/lib/sql/oprdb.userdb.functions.sql"
 EOF
@@ -221,8 +223,8 @@ function add_wdk_user {
   local dest_passwd="$3"
   local wdk_user_login="$4"
   local wdk_user_password="$5"
-  sqlplus -S -L "$dest_account/$dest_passwd@$dest_database" as sysdba <<EOF
+  sqlplus -S -L "${dest_account}/${dest_passwd}@${dest_database}" as sysdba <<EOF
 WHENEVER OSERROR EXIT FAILURE
-@"${OPR_HOME}/lib/sql/oprdb.create.wdkuser.sql" "$wdk_user_login" "$wdk_user_password"
+@"${OPR_HOME}/lib/sql/oprdb.create.wdkuser.sql" "${wdk_user_login}" "${wdk_user_password}"
 EOF
 }

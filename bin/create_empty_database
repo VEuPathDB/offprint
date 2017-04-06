@@ -21,41 +21,40 @@ if [[ ! "$1" =~ userdb|appdb ]]; then
   exit 1
 fi
 
-
 ORACLE_SID=$1
-SYS_PASSWORD=$2
+DB_DOMAIN=$2
+SYS_PASSWORD=$3
+DBCA_TEMPLATE=$4
 export ORACLE_SID
+PATH=$ORACLE_HOME/bin:$PATH
+export PATH
 
 if [[ "$(find /u02/oradata/${ORACLE_SID}/ -maxdepth 1 -name '*.dbf')" ]]; then
   errexit "dbf files exist in /u02/oradata/${ORACLE_SID}. Perhaps you need to drop an exsiting database?";
 fi
 
-OLD_UMASK=`umask`
-umask 0027
-mkdir -p /u01/app/oracle/admin/${ORACLE_SID}/adump
-mkdir -p /u01/app/oracle/admin/${ORACLE_SID}/dpdump
-mkdir -p /u01/app/oracle/admin/${ORACLE_SID}/pfile
-mkdir -p /u01/app/oracle/admin/${ORACLE_SID}/log
-mkdir -p /u01/app/oracle/cfgtoollogs/dbca/${ORACLE_SID}
-mkdir -p /u01/app/oracle/product/11.2.0.3/db_1/dbs
-mkdir -p /u02/oradata/${ORACLE_SID}
-umask ${OLD_UMASK}
-ORACLE_SID=${ORACLE_SID}; export ORACLE_SID
-PATH=$ORACLE_HOME/bin:$PATH; export PATH
+set -x
+dbca -silent -createDatabase \
+  -gdbname "${ORACLE_SID}.${DB_DOMAIN}" \
+  -sid "${ORACLE_SID}" \
+  -templateName "${DBCA_TEMPLATE}" \
+  -sysPassword "${SYS_PASSWORD}" \
+  -systemPassword "${SYS_PASSWORD}" \
+  -recoveryAreaDestination "/u02/flash_recovery_area" \
+  -automaticMemoryManagement "true"
 
-ed -s /etc/oratab <<EOF
-/${ORACLE_SID}/
-d
-w
-q
+# ensure LDAP is not used for name lookup
+sed -i '/NAMES.DIRECTORY_PATH=/c\NAMES.DIRECTORY_PATH=(TNSNAMES)' "${ORACLE_HOME}/network/admin/sqlnet.ora"
+
+if [[ ! -f  "${ORACLE_HOME}/network/admin/tnsnames.ora" ]] || ! grep -iL "${ORACLE_SID}.${DB_DOMAIN}" "${ORACLE_HOME}/network/admin/tnsnames.ora"; then
+echo "updating ${ORACLE_HOME}/network/admin/tnsnames.ora"
+cat >> ${ORACLE_HOME}/network/admin/tnsnames.ora <<EOF
+${ORACLE_SID}=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=${ORACLE_SID}.${DB_DOMAIN})))
 EOF
+fi
 
-/bin/sh -c "echo '${ORACLE_SID}:${ORACLE_HOME}:Y' >> /etc/oratab"
-
-#echo "${OPR_HOME}/lib/sql/dbsetup/dbcreate.sql" "${OPR_HOME}/lib/sql/dbsetup" "${SYS_PASSWORD}" "${ORACLE_SID}"
-
-/u01/app/oracle/product/11.2.0.3/db_1/bin/sqlplus -S /nolog <<EOF
+sqlplus -S -L system/${SYS_PASSWORD} <<EOF
 WHENEVER OSERROR EXIT FAILURE
-@"${OPR_HOME}/lib/sql/dbsetup/dbcreate.sql" "${OPR_HOME}/lib/sql/dbsetup" "${SYS_PASSWORD}" "${ORACLE_SID}"
+@"${OPR_HOME}/lib/sql/dbsetup/dbcreate.sql" "${OPR_HOME}/lib/sql/dbsetup" "${ORACLE_SID}"
 EOF
 

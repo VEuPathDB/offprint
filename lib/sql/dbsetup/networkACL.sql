@@ -3,8 +3,6 @@
 -- Must be installed by sysdba, e.g.
 --     sqlplus sys/xxxx@userdb as sysdba
 
-DEFINE acluser=&1
-
 BEGIN
 
     DBMS_NETWORK_ACL_ADMIN.drop_acl('users.xml');

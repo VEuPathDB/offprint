@@ -2,6 +2,10 @@
 : ${OPR_WD:="$HOME/.offprint"}
 : ${OPR_CONF:="$HOME/offprint.conf"}
 
+export OPR_HOME
+export OPR_WD
+export OPR_CONF
+
 function errexit {
   local msg
   [[ $# == 0 ]] && msg="at ${BASH_SOURCE[1]} line ${BASH_LINENO[0]}" || msg=$1
