@@ -78,6 +78,11 @@ FULL_SCRUB_REMAP="$(full_scrub_remap "$USER_SCHEMA")" || errexit
 readonly USERDB_PAR_FILE="${OPR_WD}/userdb.par"
 readonly APPDB_PAR_FILE="${OPR_WD}/appdb.par"
 
+# install dbca template file
+sudo -u oracle -E -P /bin/cp \
+  "${OPR_HOME}/conf/${DEST_DB_DBCA_TEMPLATE}" \
+  "${ORACLE_HOME}/assistants/dbca/templates/"
+
 ###########################################################################################
 # USERDB
 ###########################################################################################
