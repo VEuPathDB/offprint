@@ -79,7 +79,7 @@ CFG_WS_FILES_DIR=/var/www/Common/apiSiteFilesMirror/webServices
 CFG_COMMUNITY_FILES_DIR=/var/www/Common/communityFilesMirror
 
 # the host for CFG_DOWNLOAD_FILES_DIR, CFG_WS_FILES_DIR, CFG_COMMUNITY_FILES_DIR
-CFG_DATAFILES_HOST=olive.rcc.uga.edu
+CFG_DATAFILES_HOST=myrtle.gacrc.uga.edu
 
 # bash shell file that sets environment variables for the
 # specific website hosted on the VM. e.g. $PRODUCT, $RELEASE_NUMBER
