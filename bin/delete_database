@@ -37,16 +37,19 @@ pkill -9 -U oracle -f "[o]ra.*${ORACLE_SID}'"
 
 # dbca complains /u01/oradata/userdb/control01.ctl exists
 # (even when it does not) if there's an entry in tnsnames.ora.
-sed -i "/${ORACLE_SID}=/d" "${ORACLE_HOME}/network/admin/tnsnames.ora"
+if [[ -f "${ORACLE_HOME}/network/admin/tnsnames.ora" ]]; then
+  sed -i "/${ORACLE_SID}=/d" "${ORACLE_HOME}/network/admin/tnsnames.ora"
+fi
 
 # Ensure no entry in oratab, or else:
 # The Oracle system identifier(SID) ... already exists. Specify another SID.
+if [[ -f /etc/oratab ]]; then
 ed -s /etc/oratab <<EOF
 /${ORACLE_SID}/
 d
 w
 q
 EOF
+fi
 
-lsnrctl restart
-
+lsnrctl reload
