@@ -47,3 +47,6 @@ d
 w
 q
 EOF
+
+lsnrctl restart
+
