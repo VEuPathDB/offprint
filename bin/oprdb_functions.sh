@@ -25,7 +25,7 @@ function create_empty_database {
 # return first alias name found for database
 function source_db_alias {
   local source_website=$1
-  local type=$2  # userdb or appdb
+  local type=$2  # userdb or acctdb or appdb
   local url="http://${source_website}/dashboard/xml/wdk/databases/${type}/aliases/alias/value"
   local dbalias
   dbalias="$(curl -L -f -s $url)" \
@@ -37,7 +37,7 @@ function source_db_alias {
 # (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=medlar.rcc.uga.edu)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=rm15873.uga.edu)))
 function source_db_descriptor {
   local source_website=$1
-  local type=$2  # userdb or appdb
+  local type=$2  # userdb or acctdb or appdb
 
   local source_host_name
   source_host_name="$(curl -L -f -s ${SOURCE_WEBSITE}/dashboard/xml/wdk/databases/${type}/servername/value)" \
@@ -65,6 +65,21 @@ function userdb_schema_list {
 
     schemas="${schemas} $e"
   done < "${OPR_HOME}/conf/oprdb.userdb.schema"
+  echo $schemas
+}
+
+function acctdb_schema_list {
+  local acct_schema=$1
+  local schemas=''  
+  while read line; do
+    line=${line%%#*}  # strip comment (if any)
+
+    local e
+    eval e="${line}"
+    e="$(echo $e | sed s/%%account_schema%%/${account_schema}/)"
+
+    schemas="${schemas} $e"
+  done < "${OPR_HOME}/conf/oprdb.acctdb.schema"
   echo $schemas
 }
 
@@ -99,15 +114,31 @@ function userdb_export_queries {
   echo "${queries}"
 }
 
+function acctdb_export_queries {
+  local acct_schema=$1
+  local queries='# Queries for selective row exports.'
+  while read line; do
+    line=${line%%#*}  # strip comment (if any)
+
+    local e="${line}"
+    e="$(echo $e | sed "s/%%account_schema%%/${account_schema}/g")"
+
+    local queries
+    queries="$(printf '%s\n%s' "${queries}" "$e")"
+
+  done < "${OPR_HOME}/conf/oprdb.acctdb.min.exp.query"
+  echo "${queries}"
+}
+
 function full_scrub_remap {
-  local user_schema=$1
+  local account_schema=$1
   local remap='# scrub user profile data'
   while read line; do
     line=${line%%#*}  # strip comment (if any)
 
     local e
     eval e="${line}"
-    e="$(echo $e | sed "s/%%user_schema%%/${user_schema}/g")"
+    e="$(echo $e | sed "s/%%account_schema%%/${account_schema}/g")"
 
     local remap
     remap="$(printf '%s\n%s' "${remap}" "$e")"
@@ -138,6 +169,19 @@ function user_schema_name {
   echo $user_schema | tr '[:lower:]' '[:upper:]'
   return ${PIPESTATUS[0]}
 }
+
+function account_schema_name {
+  local source_website="$1"
+  local url="http://${source_website}/dashboard/xml/wdk/modelconfig/accountdb/accountschema/value"
+  
+  local account_schema
+  account_schema="$(curl -L -f -s ${url} | sed  's/\.$//')" \
+    || errexit "Unable to lookup WDK account schema from '${url}'."
+
+  echo $account_schema | tr '[:lower:]' '[:upper:]'
+  return ${PIPESTATUS[0]}
+}
+
 
 # Report the estimated size of the given database on filesystem.
 # Not a good estimate of destination size if using query filter during exp/imp.
@@ -192,6 +236,20 @@ EOF
   [[ "$?" -eq "0" ]] || errexit "Unable to create functional userdb link." 
 }
 
+function create_acctdb_dblink {
+  local dest_database="$1"
+  local dest_account="$2"
+  local dest_passwd="$3"
+  local source_database="$4"
+  local source_account="$5"
+  local source_passwd="$6"
+  sqlplus -S -L "${dest_account}/${dest_passwd}@${dest_database}" <<EOF
+WHENEVER OSERROR EXIT FAILURE
+@"${OPR_HOME}/lib/sql/oprdb.create.acctdb.dblink.sql" "${source_database}" "${source_account}" "${source_passwd}"
+EOF
+  [[ "$?" -eq "0" ]] || errexit "Unable to create functional acctdb link." 
+}
+
 
 function drop_import_dblink {
   local dest_database="$1"
@@ -205,15 +263,15 @@ EOF
   [[ "$?" -eq "0" ]] || errexit "Unable to drop import link." 
 }
 
-function create_userdb_functions {
+function create_acctdb_functions {
   local dest_database="$1"
   local dest_account="$2"
   local dest_passwd="$3"
   sqlplus -S -L "${dest_account}/${dest_passwd}@${dest_database}"  <<EOF
 WHENEVER OSERROR EXIT FAILURE
-@"${OPR_HOME}/lib/sql/oprdb.userdb.functions.sql"
+@"${OPR_HOME}/lib/sql/oprdb.acctdb.functions.sql"
 EOF
-  [[ "$?" -eq "0" ]] || errexit "Unable to install database functions." 
+  [[ "$?" -eq "0" ]] || errexit "Unable to install AccountDB database functions." 
 }
 
 function add_wdk_user {

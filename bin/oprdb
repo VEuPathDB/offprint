@@ -1,8 +1,9 @@
 #!/bin/bash
 # offprint user and/or application databases
 
-# assumes appdb and userdb have same password at source and same passwords at destination, but
-# the matched pair can be different between source and destination.
+# assumes appdb, acctdb and userdb have same password at source and same
+# passwords at destination, but the matched pair can be different
+# between source and destination.
 #set -e
 set -u
 set -x
@@ -20,8 +21,10 @@ exec > >(tee "${OPR_WD}/${this}.$(date +"%m-%d-%Y--%H-%m").log") 2>&1
 echo $this :: $(date)
 
 SKIP_USERDB_IMP=0
+SKIP_ACCTDB_IMP=0
 SKIP_APPDB_IMP=0
 SKIP_USERDB_SCRUB=0
+SKIP_ACCTDB_SCRUB=0
 SKIP_APPDB_SCRUB=0
 ARGS_NOOPTS=''
 
@@ -33,10 +36,14 @@ until [ -z "$*" ]; do
 
   if [[ "$arg" == "--skip-userdb-import" ]]; then
         SKIP_USERDB_IMP=1
+  elif [[ "$arg" == "--skip-acctdb-import" ]]; then
+        SKIP_ACCTDB_IMP=1
   elif [[ "$arg" == "--skip-appdb-import" ]]; then
         SKIP_APPDB_IMP=1
   elif [[ "$arg" == "--skip-userdb-scrub" ]]; then
         SKIP_USERDB_SCRUB=1
+  elif [[ "$arg" == "--skip-acctdb-scrub" ]]; then
+        SKIP_ACCTDB_SCRUB=1
   elif [[ "$arg" == "--skip-appdb-scrub" ]]; then
         SKIP_APPDB_SCRUB=1
   else
@@ -55,27 +62,39 @@ set --
 
 SOURCE_USERDB="$(source_db_descriptor $SOURCE_WEBSITE userdb)" || errexit
   readonly SOURCE_USERDB
+SOURCE_ACCTDB="$(source_db_descriptor $SOURCE_WEBSITE userdb)" || errexit
+  readonly SOURCE_ACCTDB
 SOURCE_APPDB="$(source_db_descriptor $SOURCE_WEBSITE appdb)" || errexit
   readonly SOURCE_APPDB
 readonly DEST_USERDB='userdb'
+readonly DEST_ACCTDB='acctdb'
 readonly DEST_APPDB='appdb'
 SOURCE_USERDB_ALIAS="$(source_db_alias $SOURCE_WEBSITE userdb)" || errexit
   readonly SOURCE_USERDB_ALIAS
+SOURCE_ACCTDB_ALIAS="$(source_db_alias $SOURCE_WEBSITE acctdb)" || errexit
+  readonly SOURCE_ACCTDB_ALIAS
 USER_SCHEMA="$(user_schema_name $SOURCE_WEBSITE)" || errexit
   readonly USER_SCHEMA
+ACCOUNT_SCHEMA="$(account_schema_name $SOURCE_WEBSITE)" || errexit
+  readonly ACCOUNT_SCHEMA
 APPDB_LOGIN_SCHEMA="$(app_login_schema_name $SOURCE_WEBSITE)" || errexit
   readonly APPDB_LOGIN_SCHEMA
 
 USERDB_SCHEMAS="$(userdb_schema_list "$USER_SCHEMA")" || errexit
   readonly USERDB_SCHEMAS
+ACCTDB_SCHEMAS="$(userdb_schema_list "$ACCOUNT_SCHEMA")" || errexit
+  readonly ACCOUNT_SCHEMA
 APPDB_SCHEMAS="$(appdb_schema_list "$APPDB_LOGIN_SCHEMA")" || errexit
   readonly APPDB_SCHEMAS
 USERDB_EXP_QUERIES="$(userdb_export_queries "$USER_SCHEMA")" || errexit
   readonly USERDB_EXP_QUERIES
-FULL_SCRUB_REMAP="$(full_scrub_remap "$USER_SCHEMA")" || errexit
+ACCTDB_EXP_QUERIES="$(acctdb_export_queries "$ACCOUNT_SCHEMA")" || errexit
+  readonly ACCTDB_EXP_QUERIES
+FULL_SCRUB_REMAP="$(full_scrub_remap "$ACCOUNT_SCHEMA")" || errexit
   readonly FULL_SCRUB_REMAP
 
 readonly USERDB_PAR_FILE="${OPR_WD}/userdb.par"
+readonly ACCTDB_PAR_FILE="${OPR_WD}/acctdb.par"
 readonly APPDB_PAR_FILE="${OPR_WD}/appdb.par"
 
 # install dbca template file
@@ -90,14 +109,6 @@ sudo -u oracle -E -P /bin/cp \
 
 if [[ "$SKIP_USERDB_IMP" -ne "1" ]]; then
 
-  delete_database userdb
-  create_empty_database userdb ${DEST_DB_DOMAIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_DB_DBCA_TEMPLATE}
-
-  create_import_dblink ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_USERDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
-  create_userdb_functions ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_USERDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD}
-
-  add_wdk_user ${DEST_USERDB} 'SYS' ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_WDK_USER_LOGIN} ${CFG_WDK_USER_PASSWORD}
-
   if [[ $SKIP_USERDB_SCRUB != 1 ]]; then
     QUERY_FILTER=$( cat <<EOF
 ${USERDB_EXP_QUERIES}
@@ -111,16 +122,17 @@ EOF
     )
   fi
 
-  if [[ $SKIP_USERDB_SCRUB != 1 ]]; then
-    REMAP=$( cat <<EOF
-${FULL_SCRUB_REMAP}
-EOF
-    )
-  else
-    REMAP=$( cat <<EOF
-EOF
-    )
-  fi
+#   if [[ $SKIP_USERDB_SCRUB != 1 ]]; then
+#     REMAP=$( cat <<EOF
+# ${FULL_SCRUB_REMAP}
+# EOF
+#     )
+#   else
+#     REMAP=$( cat <<EOF
+# EOF
+#     )
+#   fi
+  REMAP=''
 
   cat > "${USERDB_PAR_FILE}" <<EOF
 userid=${CFG_DEST_DB_SYS_LOGIN}/${CFG_DEST_DB_SYS_PASSWORD}@${DEST_USERDB}
@@ -141,6 +153,13 @@ flashback_time=systimestamp
 
 EOF
 
+  delete_database userdb
+  create_empty_database userdb ${DEST_DB_DOMAIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_DB_DBCA_TEMPLATE}
+
+  create_import_dblink ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_USERDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
+  create_userdb_functions ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_USERDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD}
+
+  add_wdk_user ${DEST_USERDB} 'SYS' ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_WDK_USER_LOGIN} ${CFG_WDK_USER_PASSWORD}
 
   impdp parfile="${USERDB_PAR_FILE}"
 
@@ -149,19 +168,75 @@ EOF
 fi
 
 ###########################################################################################
+# ACCTDB
+###########################################################################################
+
+
+if [[ "$SKIP_ACCTDB_IMP" -ne "1" ]]; then
+
+  if [[ $SKIP_ACCTDB_SCRUB != 1 ]]; then
+    QUERY_FILTER=$( cat <<EOF
+${ACCTDB_EXP_QUERIES}
+EOF
+    )
+  else
+    readonly QUERY_FILTER=$( cat <<EOF
+# exclude guests, keep all loginable users
+query=${USER_SCHEMA}.users:"WHERE is_guest != 1"
+EOF
+    )
+  fi
+
+  if [[ $SKIP_ACCTDB_SCRUB != 1 ]]; then
+    REMAP=$( cat <<EOF
+${FULL_SCRUB_REMAP}
+EOF
+    )
+  else
+    REMAP=$( cat <<EOF
+EOF
+    )
+  fi
+
+  cat > "${ACCTDB_PAR_FILE}" <<EOF
+userid=${CFG_DEST_DB_SYS_LOGIN}/${CFG_DEST_DB_SYS_PASSWORD}@${DEST_ACCTDB}
+
+network_link=${CFG_EXPDP_NETWORK_LINK}
+
+schemas=${ACCTDB_SCHEMAS}
+
+$QUERY_FILTER
+
+$REMAP
+
+job_name=acctdb_import
+table_exists_action=REPLACE
+directory=data_pump_dir
+logfile=acctdb_import.log
+flashback_time=systimestamp 
+
+EOF
+
+
+  delete_database acctdb
+  create_empty_database acctdb ${DEST_DB_DOMAIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_DB_DBCA_TEMPLATE}
+
+  create_import_dblink ${DEST_ACCTDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_ACCTDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
+  create_acctdb_functions ${DEST_ACCTDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_ACCTDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD}
+
+  add_wdk_user ${DEST_ACCTDB} 'SYS' ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_WDK_USER_LOGIN} ${CFG_WDK_USER_PASSWORD}
+
+  impdp parfile="${ACCTDB_PAR_FILE}"
+
+  drop_import_dblink ${DEST_ACCTDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
+
+fi
+###########################################################################################
 # APPDB
 ###########################################################################################
 
 if [[ "$SKIP_APPDB_IMP" -ne "1" ]]; then
 
-  delete_database appdb
-  create_empty_database appdb ${DEST_DB_DOMAIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_DB_DBCA_TEMPLATE}
-
-  create_import_dblink ${DEST_APPDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_APPDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
-
-  create_userdb_dblink ${DEST_APPDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_USERDB} ${CFG_WDK_USERDB_LINK_LOGIN} ${CFG_WDK_USERDB_LINK_PASSWORD}
-  add_wdk_user ${DEST_APPDB} 'SYS' ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_WDK_USER_LOGIN} ${CFG_WDK_USER_PASSWORD}
-  
   cat > "${APPDB_PAR_FILE}" <<EOF
 userid=${CFG_DEST_DB_SYS_LOGIN}/${CFG_DEST_DB_SYS_PASSWORD}@${DEST_APPDB}
 
@@ -177,6 +252,14 @@ flashback_time=systimestamp
 
 EOF
 
+  delete_database appdb
+  create_empty_database appdb ${DEST_DB_DOMAIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_DB_DBCA_TEMPLATE}
+
+  create_import_dblink ${DEST_APPDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_APPDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
+
+  create_userdb_dblink ${DEST_APPDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_USERDB} ${CFG_WDK_USERDB_LINK_LOGIN} ${CFG_WDK_USERDB_LINK_PASSWORD}
+  add_wdk_user ${DEST_APPDB} 'SYS' ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_WDK_USER_LOGIN} ${CFG_WDK_USER_PASSWORD}
+  
   impdp parfile="${APPDB_PAR_FILE}"
   
   drop_import_dblink ${DEST_APPDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
