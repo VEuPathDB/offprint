@@ -37,7 +37,7 @@ function source_db_alias {
 # (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=medlar.rcc.uga.edu)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=rm15873.uga.edu)))
 function source_db_descriptor {
   local source_website=$1
-  local type=$2  # userdb or acctdb or appdb
+  local type=$2  # userdb or accountdb or appdb
 
   local source_host_name
   source_host_name="$(curl -L -f -s ${SOURCE_WEBSITE}/dashboard/xml/wdk/databases/${type}/servername/value)" \
@@ -69,7 +69,7 @@ function userdb_schema_list {
 }
 
 function acctdb_schema_list {
-  local acct_schema=$1
+  local account_schema=$1
   local schemas=''  
   while read line; do
     line=${line%%#*}  # strip comment (if any)

@@ -1,4 +1,2 @@
-remap_data=%%account_schema%%.accounts.passwd:system.vm_impdp_remap.sanitize_userlogins_password
-remap_data=%%account_schema%%.accounts.email:system.vm_impdp_remap.sanitize_userlogins_email
-remap_data=%%account_schema%%.accounts.address:system.vm_impdp_remap.sanitize_userlogins_address
-remap_data=%%account_schema%%.accounts.phone_number:system.vm_impdp_remap.sanitize_userlogins_phone
+remap_data=%%account_schema%%.accounts.passwd:system.vm_impdp_remap.sanitize_accounts_password
+remap_data=%%account_schema%%.account_properties.value:system.vm_impdp_remap.sanitize_account_prop_value

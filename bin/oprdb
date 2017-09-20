@@ -62,7 +62,7 @@ set --
 
 SOURCE_USERDB="$(source_db_descriptor $SOURCE_WEBSITE userdb)" || errexit
   readonly SOURCE_USERDB
-SOURCE_ACCTDB="$(source_db_descriptor $SOURCE_WEBSITE userdb)" || errexit
+SOURCE_ACCTDB="$(source_db_descriptor $SOURCE_WEBSITE accountdb)" || errexit
   readonly SOURCE_ACCTDB
 SOURCE_APPDB="$(source_db_descriptor $SOURCE_WEBSITE appdb)" || errexit
   readonly SOURCE_APPDB
@@ -82,7 +82,7 @@ APPDB_LOGIN_SCHEMA="$(app_login_schema_name $SOURCE_WEBSITE)" || errexit
 
 USERDB_SCHEMAS="$(userdb_schema_list "$USER_SCHEMA")" || errexit
   readonly USERDB_SCHEMAS
-ACCTDB_SCHEMAS="$(userdb_schema_list "$ACCOUNT_SCHEMA")" || errexit
+ACCTDB_SCHEMAS="$(acctdb_schema_list "$ACCOUNT_SCHEMA")" || errexit
   readonly ACCOUNT_SCHEMA
 APPDB_SCHEMAS="$(appdb_schema_list "$APPDB_LOGIN_SCHEMA")" || errexit
   readonly APPDB_SCHEMAS
