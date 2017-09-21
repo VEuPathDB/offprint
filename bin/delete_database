@@ -1,12 +1,17 @@
 #!/bin/bash
 
 # This must be run as oracle user
+set -u
+set -x
+set -e
+
+
 if [[ "$USER" != "oracle" ]]; then
   errexit "This script must be run as the oracle user."
 fi
 
-if [[ ! "$1" =~ userdb|appdb ]]; then
-  echo "Usage: $this [userdb|appdb]"
+if [[ ! "$1" =~ userdb|acctdb|appdb ]]; then
+  echo "Usage: $this [userdb|acctdb|appdb]"
   exit 1
 fi
 
@@ -16,7 +21,10 @@ PATH=$ORACLE_HOME/bin:$PATH
 export ORACLE_SID
 export PATH
 
+set +e
+# ok to fail
 dbca -silent -deleteDatabase -sourceDB "${ORACLE_SID}"
+set -e
 
 # brute force cleanup in case dbca fails
 # and also files dbca does not cleanup
@@ -32,8 +40,9 @@ rm -rf "/u01/app/oracle/cfgtoollogs/dbca/${ORACLE_SID}"*
 rm -rf "${ORACLE_HOME}/oc4j/j2ee/OC4J_DBConsole_localhost_${ORACLE_SID}/"
 rm -f "/dev/shm/ora_${ORACLE_SID}_"*
 
-set -x
-pkill -9 -U oracle -f "[o]ra.*${ORACLE_SID}'"
+if pgrep  -U oracle -f "[o]ra.*${ORACLE_SID}'"; then
+  pkill -9 -U oracle -f "[o]ra.*${ORACLE_SID}'"
+fi
 
 # dbca complains /u01/oradata/userdb/control01.ctl exists
 # (even when it does not) if there's an entry in tnsnames.ora.
@@ -43,7 +52,7 @@ fi
 
 # Ensure no entry in oratab, or else:
 # The Oracle system identifier(SID) ... already exists. Specify another SID.
-if [[ -f /etc/oratab ]]; then
+if [[ -f /etc/oratab ]] && grep -q "^${ORACLE_SID}:" /etc/oratab; then
 ed -s /etc/oratab <<EOF
 /${ORACLE_SID}/
 d

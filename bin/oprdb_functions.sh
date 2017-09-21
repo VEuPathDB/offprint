@@ -61,7 +61,7 @@ function userdb_schema_list {
 
     local e
     eval e="${line}"
-    e="$(echo $e | sed s/%%user_schema%%/${user_schema}/)"
+    e="$(echo $e | sed s/%%user_schema%%/${user_schema}/)" || errexit
 
     schemas="${schemas} $e"
   done < "${OPR_HOME}/conf/oprdb.userdb.schema"
@@ -76,7 +76,7 @@ function acctdb_schema_list {
 
     local e
     eval e="${line}"
-    e="$(echo $e | sed s/%%account_schema%%/${account_schema}/)"
+    e="$(echo $e | sed s/%%account_schema%%/${account_schema}/)" || errexit
 
     schemas="${schemas} $e"
   done < "${OPR_HOME}/conf/oprdb.acctdb.schema"
@@ -91,7 +91,7 @@ function appdb_schema_list {
     
     local e
     eval e="${line}"
-    e="$(echo $e | sed "s/%%app_login_schema%%/${app_login_schema}/" )"
+    e="$(echo $e | sed "s/%%app_login_schema%%/${app_login_schema}/" )" || errexit
 
     schemas="${schemas} $e"
   done < "${OPR_HOME}/conf/oprdb.appdb.schema"
@@ -105,26 +105,26 @@ function userdb_export_queries {
     line=${line%%#*}  # strip comment (if any)
 
     local e="${line}"
-    e="$(echo $e | sed "s/%%user_schema%%/${user_schema}/g")"
+    e="$(echo $e | sed "s/%%user_schema%%/${user_schema}/g")" || errexit
 
     local queries
-    queries="$(printf '%s\n%s' "${queries}" "$e")"
+    queries="$(printf '%s\n%s' "${queries}" "$e")" || errexit
 
   done < "${OPR_HOME}/conf/oprdb.userdb.min.exp.query"
   echo "${queries}"
 }
 
 function acctdb_export_queries {
-  local acct_schema=$1
+  local account_schema=$1
   local queries='# Queries for selective row exports.'
   while read line; do
     line=${line%%#*}  # strip comment (if any)
 
     local e="${line}"
-    e="$(echo $e | sed "s/%%account_schema%%/${account_schema}/g")"
+    e="$(echo $e | sed "s/%%account_schema%%/${account_schema}/g")" || errexit
 
     local queries
-    queries="$(printf '%s\n%s' "${queries}" "$e")"
+    queries="$(printf '%s\n%s' "${queries}" "$e")" || errexit
 
   done < "${OPR_HOME}/conf/oprdb.acctdb.min.exp.query"
   echo "${queries}"
@@ -138,10 +138,10 @@ function full_scrub_remap {
 
     local e
     eval e="${line}"
-    e="$(echo $e | sed "s/%%account_schema%%/${account_schema}/g")"
+    e="$(echo $e | sed "s/%%account_schema%%/${account_schema}/g")" || errexit
 
     local remap
-    remap="$(printf '%s\n%s' "${remap}" "$e")"
+    remap="$(printf '%s\n%s' "${remap}" "$e")" || errexit
 
   done < "${OPR_HOME}/conf/oprdb.fullscrub.remap"
   echo "${remap}"
@@ -283,6 +283,6 @@ function add_wdk_user {
   local wdk_user_password="$5"
   sqlplus -S -L "${dest_account}/${dest_passwd}@${dest_database}" as sysdba <<EOF
 WHENEVER OSERROR EXIT FAILURE
-@"${OPR_HOME}/lib/sql/oprdb.create.wdkuser.sql" "${wdk_user_login}" "${wdk_user_password}"
+@"${OPR_HOME}/lib/sql/oprdb.create.${dest_database}.user.sql" "${wdk_user_login}" "${wdk_user_password}"
 EOF
 }

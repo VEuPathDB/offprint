@@ -8,4 +8,3 @@
 
 # return 0 rows for all other tables
 query="WHERE 1=2"
-

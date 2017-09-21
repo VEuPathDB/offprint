@@ -2,6 +2,10 @@
 
 # This script must be run as oracle user
 
+#set -x
+set -u
+set -e
+
 this="$(basename $0)"
 Bin=$(dirname $(readlink -f $0))
 
@@ -57,4 +61,3 @@ sqlplus -S -L system/${SYS_PASSWORD} <<EOF
 WHENEVER OSERROR EXIT FAILURE
 @"${OPR_HOME}/lib/sql/dbsetup/dbcreate.sql" "${OPR_HOME}/lib/sql/dbsetup" "${ORACLE_SID}"
 EOF
-

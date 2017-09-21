@@ -1,0 +1,455 @@
+TODO: review the failed GRANTs on a subset of users and consider
+fixing the source UserDB so individual grants are not applied (so we
+do not have to create the users in VM databases simply to avoid
+import errors)
+
+
++ impdp parfile=/home/vmbuilder/.offprint/userdb.par
+
+Import: Release 11.2.0.4.0 - Production on Wed Sep 20 20:46:14 2017
+
+Copyright (c) 1982, 2011, Oracle and/or its affiliates.  All rights reserved.
+
+Connected to: Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+FLASHBACK automatically enabled to preserve database integrity.
+Starting "SYSTEM"."USERDB_IMPORT":  system/********@userdb parfile=/home/vmbuilder/.offprint/userdb.par 
+Estimate in progress using BLOCKS method...
+Processing object type SCHEMA_EXPORT/TABLE/TABLE_DATA
+Total estimation using BLOCKS method: 18.54 GB
+Processing object type SCHEMA_EXPORT/USER
+Processing object type SCHEMA_EXPORT/SYSTEM_GRANT
+Processing object type SCHEMA_EXPORT/ROLE_GRANT
+ORA-39083: Object type ROLE_GRANT failed to create with error:
+ORA-01919: role 'USERDB_LINK' does not exist
+Failing sql is:
+ GRANT "USERDB_LINK" TO "APICOMM_DBLINK"
+Processing object type SCHEMA_EXPORT/DEFAULT_ROLE
+Processing object type SCHEMA_EXPORT/TABLESPACE_QUOTA
+Processing object type SCHEMA_EXPORT/PRE_SCHEMA/PROCACT_SCHEMA
+Processing object type SCHEMA_EXPORT/SYNONYM/SYNONYM
+Processing object type SCHEMA_EXPORT/TYPE/TYPE_SPEC
+Processing object type SCHEMA_EXPORT/TYPE/GRANT/OWNER_GRANT/OBJECT_GRANT
+Processing object type SCHEMA_EXPORT/SEQUENCE/SEQUENCE
+Processing object type SCHEMA_EXPORT/SEQUENCE/GRANT/OWNER_GRANT/OBJECT_GRANT
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "ANNOUNCE"."PROJECTS_ID_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "ANNOUNCE"."MESSAGES_ID_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "ANNOUNCE"."CATEGORY_ID_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "GBROWSEUSERS"."GBROWSE_UID_SEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "UPLOADS"."USERFILE_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."COMMENTS_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."DATASETS_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."STEP_ANALYSIS_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."USER_BASKETS_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."COMMENTSTABLEID_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."USERS_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."CATEGORIES_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."COMMENTFILE_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."COMMENTTARGETCATEGORY_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."STEPS_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."DATASET_VALUES_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."EXTERNAL_DATABASES_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."STRATEGIES_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."COMMENTSEQUENCE_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."COMMENTREFERENCE_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."LOCATIONS_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERLOGINS5"."FAVORITES_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "WDKENGINE"."DATASET_INDICES_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'WDKMAINT2' does not exist
+Failing sql is:
+GRANT SELECT ON "WDKENGINE"."DATASET_INDICES_PKSEQ" TO "WDKMAINT2"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "WDKENGINE"."ANSWERS_PKSEQ" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'WDKMAINT2' does not exist
+Failing sql is:
+GRANT SELECT ON "WDKENGINE"."ANSWERS_PKSEQ" TO "WDKMAINT2"
+Processing object type SCHEMA_EXPORT/TABLE/PROCACT_INSTANCE
+Processing object type SCHEMA_EXPORT/TABLE/TABLE
+. . imported "GBROWSEUSERS"."SESSIONS"                        0 rows
+. . imported "USERLOGINS5"."STEPS"                            0 rows
+. . imported "WDKENGINE"."CLOB_VALUES"                        0 rows
+. . imported "USERLOGINS5"."DATASETS"                         0 rows
+. . imported "USERLOGINS5"."DATASET_VALUES"                   0 rows
+. . imported "USERLOGINS5"."USERS_BACKUP"                     0 rows
+. . imported "WDKENGINE"."DATASET_VALUES"                     0 rows
+. . imported "USERLOGINS5"."USERS"                         1019 rows
+. . imported "USERLOGINS5"."STRATEGIES"                       0 rows
+. . imported "USERLOGINS5"."USER_ROLES"                       0 rows
+. . imported "USERLOGINS5"."USER_BASKETS"                     0 rows
+. . imported "WDKENGINE"."ANSWERS"                            0 rows
+. . imported "APIDB_R"."TUNINGTABLELOG"                       0 rows
+. . imported "USERLOGINS5"."PREFERENCES"                      0 rows
+. . imported "APIDB"."TEXTSEARCHABLECOMMENT"                  0 rows
+. . imported "USERLOGINS5"."STEP_ANALYSIS"                    0 rows
+. . imported "USERLOGINS5"."COMMENTS"                     15515 rows
+. . imported "WDKENGINE"."DATASET_INDICES"                    0 rows
+. . imported "USERLOGINS5"."COMMENTSEQUENCE"               1197 rows
+. . imported "APIDB"."TEXTSEARCHABLECOMMENT2"                 0 rows
+. . imported "USERLOGINS5"."COMMENTTARGETCATEGORY"       141784 rows
+. . imported "USERLOGINS5"."COMMENTSTABLEID"              36207 rows
+. . imported "USERLOGINS5"."FAVORITES"                        0 rows
+. . imported "GBROWSEUSERS"."SESSION_TBL"                     0 rows
+. . imported "USERLOGINS5"."COMMENTREFERENCE"             15366 rows
+. . imported "USERLOGINS5"."LOCATIONS"                    13424 rows
+. . imported "GBROWSEUSERS"."USERS"                           0 rows
+. . imported "TOXOCOMM"."COMMENTS"                            0 rows
+. . imported "UPLOADS"."USERFILE"                             0 rows
+. . imported "USERLOGINS5"."COMMENT_EXTERNAL_DATABASE"    15495 rows
+. . imported "ANNOUNCE"."MESSAGES"                            0 rows
+. . imported "USERLOGINS5"."COMMENTFILE"                    636 rows
+. . imported "USERLOGINS5"."EXTERNAL_DATABASES"            1922 rows
+. . imported "TOXOCOMM"."COMMENT_EXTERNAL_DATABASE"           0 rows
+. . imported "TOXOCOMM"."EXTERNAL_DATABASES"                  0 rows
+. . imported "USERLOGINS5"."COMMENT_USERS"                    0 rows
+. . imported "ANNOUNCE"."CATEGORY"                            0 rows
+. . imported "ANNOUNCE"."MESSAGE_PROJECTS"                    0 rows
+. . imported "ANNOUNCE"."PROJECTS"                            0 rows
+. . imported "APIDB"."NEXTGENSEQCOVERAGE"                     0 rows
+. . imported "APIDB"."UPCASE_EMAIL"                           0 rows
+. . imported "APIDB_R"."TUNINGFAMILY"                         0 rows
+. . imported "APIDB_R"."TUNINGINSTANCE"                       0 rows
+. . imported "GBROWSEUSERS"."DBINFO"                          0 rows
+. . imported "TOXOCOMM"."COMMENT_TARGET"                      0 rows
+. . imported "TOXOCOMM"."LOCATIONS"                           0 rows
+. . imported "TOXOCOMM"."REVIEW_STATUS"                       0 rows
+. . imported "USERLOGINS5"."COMMENT_TARGET"                   5 rows
+. . imported "USERLOGINS5"."CONFIG"                           1 rows
+. . imported "USERLOGINS5"."REVIEW_STATUS"                    8 rows
+. . imported "USERLOGINS5"."TARGETCATEGORY"                  32 rows
+. . imported "APIDB"."DATASOURCE"                             0 rows
+. . imported "APIDB"."GENEFEATURENAME"                        0 rows
+. . imported "APIDB"."GENEFEATUREPRODUCT"                     0 rows
+. . imported "GBROWSEUSERS"."OPENID_USERS"                    0 rows
+. . imported "GBROWSEUSERS"."SHARING"                         0 rows
+. . imported "GBROWSEUSERS"."UPLOADS"                         0 rows
+. . imported "USERLOGINS5"."CATEGORIES"                       0 rows
+Processing object type SCHEMA_EXPORT/TABLE/GRANT/OWNER_GRANT/OBJECT_GRANT
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT DELETE ON "ANNOUNCE"."MESSAGES" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "ANNOUNCE"."MESSAGE_PROJECTS" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT UPDATE ON "ANNOUNCE"."MESSAGE_PROJECTS" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT DELETE ON "ANNOUNCE"."MESSAGE_PROJECTS" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT INSERT ON "ANNOUNCE"."MESSAGE_PROJECTS" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT DELETE ON "ANNOUNCE"."CATEGORY" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT INSERT ON "ANNOUNCE"."CATEGORY" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "ANNOUNCE"."CATEGORY" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT UPDATE ON "ANNOUNCE"."CATEGORY" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "ANNOUNCE"."PROJECTS" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT UPDATE ON "ANNOUNCE"."PROJECTS" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT DELETE ON "ANNOUNCE"."PROJECTS" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT INSERT ON "ANNOUNCE"."PROJECTS" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT INSERT ON "ANNOUNCE"."MESSAGES" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "ANNOUNCE"."MESSAGES" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT UPDATE ON "ANNOUNCE"."MESSAGES" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'USERDB_LINK' does not exist
+Failing sql is:
+GRANT UPDATE ON "APIDB_R"."TUNINGTABLELOG" TO "USERDB_LINK"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'USERDB_LINK' does not exist
+Failing sql is:
+GRANT INSERT ON "APIDB_R"."TUNINGTABLELOG" TO "USERDB_LINK"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'USERDB_LINK' does not exist
+Failing sql is:
+GRANT DELETE ON "APIDB_R"."TUNINGTABLELOG" TO "USERDB_LINK"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'PLASMODBWWW' does not exist
+Failing sql is:
+GRANT UPDATE ON "APIDB_R"."TUNINGTABLELOG" TO "PLASMODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'PLASMODBWWW' does not exist
+Failing sql is:
+GRANT SELECT ON "APIDB_R"."TUNINGTABLELOG" TO "PLASMODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'PLASMODBWWW' does not exist
+Failing sql is:
+GRANT INSERT ON "APIDB_R"."TUNINGTABLELOG" TO "PLASMODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'PLASMODBWWW' does not exist
+Failing sql is:
+GRANT DELETE ON "APIDB_R"."TUNINGTABLELOG" TO "PLASMODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT SELECT ON "TOXOCOMM"."COMMENTS" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT INSERT ON "TOXOCOMM"."COMMENTS" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT DELETE ON "TOXOCOMM"."COMMENTS" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT REFERENCES ON "TOXOCOMM"."COMMENTS" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT UPDATE ON "TOXOCOMM"."COMMENTS" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT REFERENCES ON "TOXOCOMM"."COMMENT_EXTERNAL_DATABASE" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT UPDATE ON "TOXOCOMM"."COMMENT_EXTERNAL_DATABASE" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT SELECT ON "TOXOCOMM"."COMMENT_EXTERNAL_DATABASE" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT INSERT ON "TOXOCOMM"."COMMENT_EXTERNAL_DATABASE" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT DELETE ON "TOXOCOMM"."COMMENT_EXTERNAL_DATABASE" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT REFERENCES ON "TOXOCOMM"."COMMENT_TARGET" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT UPDATE ON "TOXOCOMM"."COMMENT_TARGET" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT SELECT ON "TOXOCOMM"."COMMENT_TARGET" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT INSERT ON "TOXOCOMM"."COMMENT_TARGET" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT DELETE ON "TOXOCOMM"."COMMENT_TARGET" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT REFERENCES ON "TOXOCOMM"."EXTERNAL_DATABASES" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT UPDATE ON "TOXOCOMM"."EXTERNAL_DATABASES" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT SELECT ON "TOXOCOMM"."EXTERNAL_DATABASES" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT INSERT ON "TOXOCOMM"."EXTERNAL_DATABASES" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT DELETE ON "TOXOCOMM"."EXTERNAL_DATABASES" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT REFERENCES ON "TOXOCOMM"."LOCATIONS" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT UPDATE ON "TOXOCOMM"."LOCATIONS" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT SELECT ON "TOXOCOMM"."LOCATIONS" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT INSERT ON "TOXOCOMM"."LOCATIONS" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT DELETE ON "TOXOCOMM"."LOCATIONS" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT REFERENCES ON "TOXOCOMM"."REVIEW_STATUS" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT UPDATE ON "TOXOCOMM"."REVIEW_STATUS" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT SELECT ON "TOXOCOMM"."REVIEW_STATUS" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT INSERT ON "TOXOCOMM"."REVIEW_STATUS" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'TOXODBWWW' does not exist
+Failing sql is:
+GRANT DELETE ON "TOXOCOMM"."REVIEW_STATUS" TO "TOXODBWWW"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'USERDB_LINK' does not exist
+Failing sql is:
+GRANT DELETE ON "USERLOGINS5"."COMMENTSTABLEID" TO "USERDB_LINK"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'USERDB_LINK' does not exist
+Failing sql is:
+GRANT INSERT ON "USERLOGINS5"."COMMENTSTABLEID" TO "USERDB_LINK"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'USERDB_LINK' does not exist
+Failing sql is:
+GRANT UPDATE ON "USERLOGINS5"."COMMENTSTABLEID" TO "USERDB_LINK"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'WDKUSER' does not exist
+Failing sql is:
+GRANT REFERENCES ON "WDKENGINE"."DATASET_INDICES" TO "WDKUSER"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'WDKUSER' does not exist
+Failing sql is:
+GRANT REFERENCES ON "WDKENGINE"."ANSWERS" TO "WDKUSER"
+Processing object type SCHEMA_EXPORT/PACKAGE/PACKAGE_SPEC
+Processing object type SCHEMA_EXPORT/FUNCTION/FUNCTION
+Processing object type SCHEMA_EXPORT/FUNCTION/GRANT/OWNER_GRANT/OBJECT_GRANT
+Processing object type SCHEMA_EXPORT/PROCEDURE/PROCEDURE
+Processing object type SCHEMA_EXPORT/PROCEDURE/GRANT/OWNER_GRANT/OBJECT_GRANT
+Processing object type SCHEMA_EXPORT/PACKAGE/COMPILE_PACKAGE/PACKAGE_SPEC/ALTER_PACKAGE_SPEC
+Processing object type SCHEMA_EXPORT/FUNCTION/ALTER_FUNCTION
+ORA-39082: Object type ALTER_FUNCTION:"APIDB"."SEARCHABLE_COMMENT_TEXT" created with compilation warnings
+Processing object type SCHEMA_EXPORT/PROCEDURE/ALTER_PROCEDURE
+ORA-39082: Object type ALTER_PROCEDURE:"APIDB"."MOVE_COMMENTS" created with compilation warnings
+ORA-39082: Object type ALTER_PROCEDURE:"APIDB"."MOVE_COMMENTS2" created with compilation warnings
+ORA-39082: Object type ALTER_PROCEDURE:"APIDB"."MOVE_COMMENTS3" created with compilation warnings
+Processing object type SCHEMA_EXPORT/TABLE/INDEX/INDEX
+Processing object type SCHEMA_EXPORT/TABLE/CONSTRAINT/CONSTRAINT
+Processing object type SCHEMA_EXPORT/TABLE/INDEX/STATISTICS/INDEX_STATISTICS
+Processing object type SCHEMA_EXPORT/VIEW/VIEW
+Processing object type SCHEMA_EXPORT/VIEW/GRANT/OWNER_GRANT/OBJECT_GRANT
+Processing object type SCHEMA_EXPORT/TABLE/CONSTRAINT/REF_CONSTRAINT
+Processing object type SCHEMA_EXPORT/TABLE/TRIGGER
+Processing object type SCHEMA_EXPORT/TABLE/STATISTICS/TABLE_STATISTICS
+Processing object type SCHEMA_EXPORT/TABLE/INDEX/DOMAIN_INDEX/INDEX
+Job "SYSTEM"."USERDB_IMPORT" completed with 89 error(s) at Wed Sep 20 20:47:55 2017 elapsed 0 00:01:37
+
+

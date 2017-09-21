@@ -4,7 +4,7 @@
 # assumes appdb, acctdb and userdb have same password at source and same
 # passwords at destination, but the matched pair can be different
 # between source and destination.
-#set -e
+set -e
 set -u
 set -x
 
@@ -157,13 +157,15 @@ EOF
   create_empty_database userdb ${DEST_DB_DOMAIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_DB_DBCA_TEMPLATE}
 
   create_import_dblink ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_USERDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
-  create_userdb_functions ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_USERDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD}
+  #create_userdb_functions ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_USERDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD}
 
   add_wdk_user ${DEST_USERDB} 'SYS' ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_WDK_USER_LOGIN} ${CFG_WDK_USER_PASSWORD}
 
   impdp parfile="${USERDB_PAR_FILE}"
 
   drop_import_dblink ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
+
+  echo "end UserDB setup"
 
 fi
 
@@ -217,7 +219,8 @@ flashback_time=systimestamp
 
 EOF
 
-
+  # delete is required, reusing an existing database will prevent create from
+  # exiting cleanly.
   delete_database acctdb
   create_empty_database acctdb ${DEST_DB_DOMAIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_DB_DBCA_TEMPLATE}
 
@@ -229,6 +232,8 @@ EOF
   impdp parfile="${ACCTDB_PAR_FILE}"
 
   drop_import_dblink ${DEST_ACCTDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
+
+  echo "end AcctDB setup"
 
 fi
 ###########################################################################################
@@ -264,7 +269,7 @@ EOF
   
   drop_import_dblink ${DEST_APPDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
   
-
+  echo "end AppDB setup"
 fi
 
 
