@@ -61,7 +61,7 @@ function userdb_schema_list {
 
     local e
     eval e="${line}"
-    e="$(echo $e | sed s/%%user_schema%%/${user_schema}/)" || errexit
+    e="$(echo $e | sed s/%%user_schema%%/${user_schema}/)" || errexit "unable to set user_schema in parfile"
 
     schemas="${schemas} $e"
   done < "${OPR_HOME}/conf/oprdb.userdb.schema"
@@ -76,7 +76,7 @@ function acctdb_schema_list {
 
     local e
     eval e="${line}"
-    e="$(echo $e | sed s/%%account_schema%%/${account_schema}/)" || errexit
+    e="$(echo $e | sed s/%%account_schema%%/${account_schema}/)" || errexit "unable to set account_schema in parfile"
 
     schemas="${schemas} $e"
   done < "${OPR_HOME}/conf/oprdb.acctdb.schema"
@@ -91,7 +91,7 @@ function appdb_schema_list {
     
     local e
     eval e="${line}"
-    e="$(echo $e | sed "s/%%app_login_schema%%/${app_login_schema}/" )" || errexit
+    e="$(echo $e | sed "s/%%app_login_schema%%/${app_login_schema}/" )" || errexit "unable to set app_login_schema in parfile"
 
     schemas="${schemas} $e"
   done < "${OPR_HOME}/conf/oprdb.appdb.schema"
@@ -105,10 +105,10 @@ function userdb_export_queries {
     line=${line%%#*}  # strip comment (if any)
 
     local e="${line}"
-    e="$(echo $e | sed "s/%%user_schema%%/${user_schema}/g")" || errexit
+    e="$(echo $e | sed "s/%%user_schema%%/${user_schema}/g")" || errexit "unable to set user_schema for userdb export queries in parfile"
 
     local queries
-    queries="$(printf '%s\n%s' "${queries}" "$e")" || errexit
+    queries="$(printf '%s\n%s' "${queries}" "$e")" || errexit "unable to set user export queries for parfile"
 
   done < "${OPR_HOME}/conf/oprdb.userdb.min.exp.query"
   echo "${queries}"
@@ -121,10 +121,10 @@ function acctdb_export_queries {
     line=${line%%#*}  # strip comment (if any)
 
     local e="${line}"
-    e="$(echo $e | sed "s/%%account_schema%%/${account_schema}/g")" || errexit
+    e="$(echo $e | sed "s/%%account_schema%%/${account_schema}/g")" || errexit "unable to set account_schema for acctdb export queries in parfile"
 
     local queries
-    queries="$(printf '%s\n%s' "${queries}" "$e")" || errexit
+    queries="$(printf '%s\n%s' "${queries}" "$e")" || errexit "unable to set acctdb export queries in parfile"
 
   done < "${OPR_HOME}/conf/oprdb.acctdb.min.exp.query"
   echo "${queries}"
@@ -138,10 +138,10 @@ function full_scrub_remap {
 
     local e
     eval e="${line}"
-    e="$(echo $e | sed "s/%%account_schema%%/${account_schema}/g")" || errexit
+    e="$(echo $e | sed "s/%%account_schema%%/${account_schema}/g")" || errexit "unable to set account_schema for full_scrub_map"
 
     local remap
-    remap="$(printf '%s\n%s' "${remap}" "$e")" || errexit
+    remap="$(printf '%s\n%s' "${remap}" "$e")" || errexit "unable to set remap for full_scrub_remap"
 
   done < "${OPR_HOME}/conf/oprdb.fullscrub.remap"
   echo "${remap}"

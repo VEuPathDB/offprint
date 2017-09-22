@@ -1,0 +1,6 @@
+auto generate oprdb.appdb.schema from query
+
+select upper(name) from core.databaseinfo order by upper(name);
+
+
+important use case: APIDBUSERDATASETS schema, workspaces-related?,  is plas but not ameb (don't know about others)

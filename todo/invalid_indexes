@@ -1,0 +1,21 @@
+indexes where owner != table_owner
+cause errors when importing a database that omits
+the owner but not the table. e.g. OT_IND06 on SRES.ONTOLOGYTERM owned
+by JOEJOE. BLASTP_TEXT_IX is ok because APIDBTUNING is included in the import.
+
+column owner FORMAT A12
+column table_owner FORMAT A12
+column table_name FORMAT A12
+column index_name FORMAT A22
+column index_type FORMAT A12
+
+select owner, table_owner, table_name, index_name, index_type from dba_indexes where owner != table_owner;
+
+
+OWNER	     TABLE_OWNER  TABLE_NAME   INDEX_NAME	      INDEX_TYPE
+------------ ------------ ------------ ---------------------- ------------
+JOEDOE	     SRES	  ONTOLOGYTERM OT_IND06 	      NORMAL
+APIDBTUNING  CORE	  TABLEINFO    BLASTP_TEXT_IX	      NORMAL
+
+
+corss ref with schema in oprdb.appdb.schema to id the problem indices
