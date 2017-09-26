@@ -207,6 +207,7 @@ EOF
   echo $source_db_size
 }
 
+# VM destination database to production source database
 function create_import_dblink {
   local dest_database="$1"
   local dest_account="$2"
@@ -222,6 +223,7 @@ EOF
   [[ "$?" -eq "0" ]] || errexit "Unable to create functional import link." 
 }
 
+# AppDB to AccountDB
 function create_userdb_dblink {
   local dest_database="$1"
   local dest_account="$2"
@@ -236,6 +238,7 @@ EOF
   [[ "$?" -eq "0" ]] || errexit "Unable to create functional userdb link." 
 }
 
+# AppDB to AccountDB
 function create_acctdb_dblink {
   local dest_database="$1"
   local dest_account="$2"
