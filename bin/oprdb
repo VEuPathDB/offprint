@@ -84,14 +84,13 @@ USERDB_SCHEMAS="$(userdb_schema_list "$USER_SCHEMA")" || errexit
   readonly USERDB_SCHEMAS
 ACCTDB_SCHEMAS="$(acctdb_schema_list "$ACCOUNT_SCHEMA")" || errexit
   readonly ACCOUNT_SCHEMA
-APPDB_SCHEMAS="$(appdb_schema_list "$APPDB_LOGIN_SCHEMA")" || errexit
-  readonly APPDB_SCHEMAS
 USERDB_EXP_QUERIES="$(userdb_export_queries "$USER_SCHEMA")" || errexit
   readonly USERDB_EXP_QUERIES
 ACCTDB_EXP_QUERIES="$(acctdb_export_queries "$ACCOUNT_SCHEMA")" || errexit
   readonly ACCTDB_EXP_QUERIES
 FULL_SCRUB_REMAP="$(full_scrub_remap "$ACCOUNT_SCHEMA")" || errexit
   readonly FULL_SCRUB_REMAP
+APPDB_EXCLUDES="$(appdb_excludes_list)" || errexit
 
 readonly USERDB_PAR_FILE="${OPR_WD}/userdb.par"
 readonly ACCTDB_PAR_FILE="${OPR_WD}/acctdb.par"
@@ -242,12 +241,22 @@ fi
 
 if [[ "$SKIP_APPDB_IMP" -ne "1" ]]; then
 
+  delete_database appdb
+  create_empty_database appdb ${DEST_DB_DOMAIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_DB_DBCA_TEMPLATE} || errexit "unable to create_empty_database"
+
+  create_import_dblink ${DEST_APPDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_APPDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD} ${CFG_EXPDP_NETWORK_LINK} || errexit "create_import_dblink"
+
+  # appdb_schema_list must come after create_import_dblink
+  APPDB_SCHEMAS="$(appdb_schema_list ${DEST_APPDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_EXPDP_NETWORK_LINK})" || errexit
+  
   cat > "${APPDB_PAR_FILE}" <<EOF
 userid=${CFG_DEST_DB_SYS_LOGIN}/${CFG_DEST_DB_SYS_PASSWORD}@${DEST_APPDB}
 
 network_link=${CFG_EXPDP_NETWORK_LINK}
 
 schemas=${APPDB_SCHEMAS}
+
+$APPDB_EXCLUDES
 
 job_name=appdb_import
 table_exists_action=REPLACE
@@ -257,10 +266,6 @@ flashback_time=systimestamp
 
 EOF
 
-  delete_database appdb
-  create_empty_database appdb ${DEST_DB_DOMAIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_DB_DBCA_TEMPLATE} || errexit "unable to create_empty_database"
-
-  create_import_dblink ${DEST_APPDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_APPDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD} ${CFG_EXPDP_NETWORK_LINK} || errexit "create_import_dblink"
 
   create_userdb_dblink ${DEST_APPDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_USERDB} ${CFG_WDK_USERDB_LINK_LOGIN} ${CFG_WDK_USERDB_LINK_PASSWORD} || errexit "unable to create_userdb_dblink"
   add_wdk_user ${DEST_APPDB} 'SYS' ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_WDK_USER_LOGIN} ${CFG_WDK_USER_PASSWORD} || errexit "unable to add_wdk_user"
