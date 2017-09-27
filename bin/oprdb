@@ -102,73 +102,6 @@ sudo -u oracle -E -P /bin/cp \
   "${ORACLE_HOME}/assistants/dbca/templates/"
 
 ###########################################################################################
-# USERDB
-###########################################################################################
-
-
-if [[ "$SKIP_USERDB_IMP" -ne "1" ]]; then
-
-  if [[ $SKIP_USERDB_SCRUB != 1 ]]; then
-    QUERY_FILTER=$( cat <<EOF
-${USERDB_EXP_QUERIES}
-EOF
-    )
-  else
-    readonly QUERY_FILTER=$( cat <<EOF
-# exclude guests, keep all loginable users
-query=${USER_SCHEMA}.users:"WHERE is_guest != 1"
-EOF
-    )
-  fi
-
-#   if [[ $SKIP_USERDB_SCRUB != 1 ]]; then
-#     REMAP=$( cat <<EOF
-# ${FULL_SCRUB_REMAP}
-# EOF
-#     )
-#   else
-#     REMAP=$( cat <<EOF
-# EOF
-#     )
-#   fi
-  REMAP=''
-
-  cat > "${USERDB_PAR_FILE}" <<EOF
-userid=${CFG_DEST_DB_SYS_LOGIN}/${CFG_DEST_DB_SYS_PASSWORD}@${DEST_USERDB}
-
-network_link=${CFG_EXPDP_NETWORK_LINK}
-
-schemas=${USERDB_SCHEMAS}
-
-$QUERY_FILTER
-
-$REMAP
-
-job_name=userdb_import
-table_exists_action=REPLACE
-directory=data_pump_dir
-logfile=userdb_import.log
-flashback_time=systimestamp 
-
-EOF
-
-  delete_database userdb
-  create_empty_database userdb ${DEST_DB_DOMAIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_DB_DBCA_TEMPLATE}
-
-  create_import_dblink ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_USERDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
-  #create_userdb_functions ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_USERDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD}
-
-  add_wdk_user ${DEST_USERDB} 'SYS' ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_WDK_USER_LOGIN} ${CFG_WDK_USER_PASSWORD}
-
-  impdp parfile="${USERDB_PAR_FILE}"
-
-  drop_import_dblink ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
-
-  echo "end UserDB setup"
-
-fi
-
-###########################################################################################
 # ACCTDB
 ###########################################################################################
 
@@ -222,7 +155,7 @@ EOF
   # exiting cleanly.
   delete_database acctdb
   create_empty_database acctdb ${DEST_DB_DOMAIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_DB_DBCA_TEMPLATE}
-
+  enable_database_autostart acctdb
   create_import_dblink ${DEST_ACCTDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_ACCTDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
   create_acctdb_functions ${DEST_ACCTDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_ACCTDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD}
 
@@ -235,6 +168,74 @@ EOF
   echo "end AcctDB setup"
 
 fi
+
+###########################################################################################
+# USERDB
+###########################################################################################
+
+
+if [[ "$SKIP_USERDB_IMP" -ne "1" ]]; then
+
+  if [[ $SKIP_USERDB_SCRUB != 1 ]]; then
+    QUERY_FILTER=$( cat <<EOF
+${USERDB_EXP_QUERIES}
+EOF
+    )
+  else
+    readonly QUERY_FILTER=$( cat <<EOF
+# exclude guests, keep all loginable users
+query=${USER_SCHEMA}.users:"WHERE is_guest != 1"
+EOF
+    )
+  fi
+
+#   if [[ $SKIP_USERDB_SCRUB != 1 ]]; then
+#     REMAP=$( cat <<EOF
+# ${FULL_SCRUB_REMAP}
+# EOF
+#     )
+#   else
+#     REMAP=$( cat <<EOF
+# EOF
+#     )
+#   fi
+  REMAP=''
+
+  cat > "${USERDB_PAR_FILE}" <<EOF
+userid=${CFG_DEST_DB_SYS_LOGIN}/${CFG_DEST_DB_SYS_PASSWORD}@${DEST_USERDB}
+
+network_link=${CFG_EXPDP_NETWORK_LINK}
+
+schemas=${USERDB_SCHEMAS}
+
+$QUERY_FILTER
+
+$REMAP
+
+job_name=userdb_import
+table_exists_action=REPLACE
+directory=data_pump_dir
+logfile=userdb_import.log
+flashback_time=systimestamp 
+
+EOF
+
+  delete_database userdb
+  create_empty_database userdb ${DEST_DB_DOMAIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_DB_DBCA_TEMPLATE}
+  enable_database_autostart userdb
+  create_import_dblink ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_USERDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
+  #create_userdb_functions ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_USERDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD}
+
+  add_wdk_user ${DEST_USERDB} 'SYS' ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_WDK_USER_LOGIN} ${CFG_WDK_USER_PASSWORD}
+
+  impdp parfile="${USERDB_PAR_FILE}"
+
+  drop_import_dblink ${DEST_USERDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_EXPDP_NETWORK_LINK}
+
+  echo "end UserDB setup"
+
+fi
+
 ###########################################################################################
 # APPDB
 ###########################################################################################
@@ -243,7 +244,7 @@ if [[ "$SKIP_APPDB_IMP" -ne "1" ]]; then
 
   delete_database appdb
   create_empty_database appdb ${DEST_DB_DOMAIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_DB_DBCA_TEMPLATE} || errexit "unable to create_empty_database"
-
+  enable_database_autostart appdb
   create_import_dblink ${DEST_APPDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${SOURCE_APPDB} ${CFG_SRC_DB_EXPDP_LOGIN} ${CFG_SRC_DB_EXPDP_PASSWORD} ${CFG_EXPDP_NETWORK_LINK} || errexit "create_import_dblink"
 
   # appdb_schema_list must come after create_import_dblink

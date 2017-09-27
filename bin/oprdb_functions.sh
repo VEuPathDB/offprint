@@ -22,6 +22,13 @@ function create_empty_database {
   sudo -u oracle -E -P "${OPR_HOME}/bin/create_empty_database" "${dest_database}" "${dest_domain}" "${dest_passwd}" "${dbca_template}"
 }
 
+function enable_database_autostart {
+  local dest_database="$1"
+  printf '%s\n' ",s/^${dest_database}:\(.*\):[NY]/${dest_database}:\1:Y/" w q | \
+    sudo -u oracle -E -P  ed -s /etc/oratab || \
+    errexit "Unable to enable autostart in /etc/oratab"
+}
+
 # return first alias name found for database
 function source_db_alias {
   local source_website=$1
@@ -55,7 +62,7 @@ function source_db_descriptor {
 
 function userdb_schema_list {
   local user_schema=$1
-  local schemas=''  
+  local schemas=''
   while read line; do
     line=${line%%#*}  # strip comment (if any)
 
@@ -70,7 +77,7 @@ function userdb_schema_list {
 
 function acctdb_schema_list {
   local account_schema=$1
-  local schemas=''  
+  local schemas=''
   while read line; do
     line=${line%%#*}  # strip comment (if any)
 
@@ -176,7 +183,7 @@ function app_login_schema_name {
 function user_schema_name {
   local source_website="$1"
   local url="http://${source_website}/dashboard/xml/wdk/modelconfig/userdb/userschema/value"
-  
+
   local user_schema
   user_schema="$(curl -L -f -s ${url} | sed  's/\.$//')" \
     || errexit "Unable to lookup WDK user schema from '${url}'."
@@ -188,7 +195,7 @@ function user_schema_name {
 function account_schema_name {
   local source_website="$1"
   local url="http://${source_website}/dashboard/xml/wdk/modelconfig/accountdb/accountschema/value"
-  
+
   local account_schema
   account_schema="$(curl -L -f -s ${url} | sed  's/\.$//')" \
     || errexit "Unable to lookup WDK account schema from '${url}'."
@@ -235,7 +242,7 @@ function create_import_dblink {
 WHENEVER OSERROR EXIT FAILURE
 @"${OPR_HOME}/lib/sql/oprdb.create.import.dblink.sql" "${source_database}" "${source_account}" "${source_passwd}" "${link_name}"
 EOF
-  [[ "$?" -eq "0" ]] || errexit "Unable to create functional import link." 
+  [[ "$?" -eq "0" ]] || errexit "Unable to create functional import link."
 }
 
 # AppDB to AccountDB
@@ -250,7 +257,7 @@ function create_userdb_dblink {
 WHENEVER OSERROR EXIT FAILURE
 @"${OPR_HOME}/lib/sql/oprdb.create.userdb.dblink.sql" "${source_database}" "${source_account}" "${source_passwd}"
 EOF
-  [[ "$?" -eq "0" ]] || errexit "Unable to create functional userdb link." 
+  [[ "$?" -eq "0" ]] || errexit "Unable to create functional userdb link."
 }
 
 # AppDB to AccountDB
@@ -265,7 +272,7 @@ function create_acctdb_dblink {
 WHENEVER OSERROR EXIT FAILURE
 @"${OPR_HOME}/lib/sql/oprdb.create.acctdb.dblink.sql" "${source_database}" "${source_account}" "${source_passwd}"
 EOF
-  [[ "$?" -eq "0" ]] || errexit "Unable to create functional acctdb link." 
+  [[ "$?" -eq "0" ]] || errexit "Unable to create functional acctdb link."
 }
 
 
@@ -278,7 +285,7 @@ function drop_import_dblink {
 WHENEVER OSERROR EXIT FAILURE
 @"${OPR_HOME}/lib/sql/oprdb.drop.import.dblink.sql" "${link_name}"
 EOF
-  [[ "$?" -eq "0" ]] || errexit "Unable to drop import link." 
+  [[ "$?" -eq "0" ]] || errexit "Unable to drop import link."
 }
 
 function create_acctdb_functions {
@@ -289,7 +296,7 @@ function create_acctdb_functions {
 WHENEVER OSERROR EXIT FAILURE
 @"${OPR_HOME}/lib/sql/oprdb.acctdb.functions.sql"
 EOF
-  [[ "$?" -eq "0" ]] || errexit "Unable to install AccountDB database functions." 
+  [[ "$?" -eq "0" ]] || errexit "Unable to install AccountDB database functions."
 }
 
 function add_wdk_user {
