@@ -53,7 +53,7 @@ function stash_db_credentials {
   else
     sudo sh -c  "printf '%s\t%s\t%s\n' $dest_database $dest_account $dest_passwd >> $cred_file" || errexit "Unable to append /etc/vm_db_creds.csv"
   fi
-  chmod 0644 "cred_file"
+  sudo chmod 0644 "$cred_file"
 }
 
 # Return descriptor of form
