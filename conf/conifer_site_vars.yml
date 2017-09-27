@@ -1,0 +1,13 @@
+modelconfig_authenticationMethod: user_db
+
+modelconfig_accountDb_connectionUrl: jdbc:oracle:oci:@acctDb
+modelconfig_accountDb_login:    "{{ lookup('csvfile', 'acctdb file=/etc//etc/vm_db_creds.tab col=1') }}"
+modelconfig_accountDb_password: "{{ lookup('csvfile', 'acctdb file=/etc//etc/vm_db_creds.tab col=2') }}"
+
+modelconfig_appDb_connectionUrl: jdbc:oracle:oci:@appdb
+modelconfig_appDb_login:    "{{ lookup('csvfile', 'appdb file=/etc//etc/vm_db_creds.tab col=1') }}"
+modelconfig_appDb_password: "{{ lookup('csvfile', 'appdb file=/etc//etc/vm_db_creds.tab col=2') }}"
+
+modelconfig_userDb_connectionUrl: jdbc:oracle:oci:@userdb
+modelconfig_userDb_login:    "{{ lookup('csvfile', 'userdb file=/etc//etc/vm_db_creds.tab col=1') }}"
+modelconfig_userDb_password: "{{ lookup('csvfile', 'userb file=/etc//etc/vm_db_creds.tab col=2') }}"

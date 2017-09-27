@@ -40,6 +40,22 @@ function source_db_alias {
   echo $dbalias
 }
 
+# db credentials to file for Conifer to slurp.
+# Format:
+#   appdb^Ivmuser^Ivollyvoo
+function stash_db_credentials {
+  local dest_database="$1"
+  local dest_account="$2"
+  local dest_passwd="$3"
+  local cred_file="/etc/vm_db_creds.tab"
+  if [[ -f "$cred_file" ]] && grep -q "^$dest_database" "$cred_file"; then
+    sudo sed -i "s/^$dest_database\t.*/$dest_database\t$dest_account\t$dest_passwd/" $cred_file
+  else
+    sudo sh -c  "printf '%s\t%s\t%s\n' $dest_database $dest_account $dest_passwd >> $cred_file" || errexit "Unable to append /etc/vm_db_creds.csv"
+  fi
+  chmod 0644 "cred_file"
+}
+
 # Return descriptor of form
 # (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=medlar.rcc.uga.edu)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=rm15873.uga.edu)))
 function source_db_descriptor {
