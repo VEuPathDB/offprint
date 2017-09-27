@@ -1,0 +1,9 @@
+currently the offprint.conf needs the password
+for apicomm_dblink to match source
+
+CFG_WDK_USERDB_LINK_LOGIN=apicomm_dblink
+CFG_WDK_USERDB_LINK_PASSWORD=xxx
+
+Instead, actually use the set values to create
+the user (does not have to apicomm_dblinke) with
+configured password.

@@ -87,7 +87,7 @@ Other quasi-configuration files can be found in `offprint/conf/`. These should n
 
   Oracle expdp remap\_data instructions.
   
-  `%%user_schema%%` is a macro as described above for `oprdb.userdb.schema`. These lines will be copied into the parameter file used by `impdp`. The remapping functions are defined in `offprint/lib/sql/oprdb.userdb.functions.sql`.
+  `%%account_schema%%` is a macro as described above for `oprdb.acctdb.schema`. These lines will be copied into the parameter file used by `impdp`. The remapping functions are defined in `offprint/lib/sql/oprdb.acctdb.functions.sql`.
 
 #### Logging
 

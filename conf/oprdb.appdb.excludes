@@ -1,0 +1,1 @@
+exclude=TABLE:"IN(select table_name from all_tables where owner = 'APIDBTUNING' and regexp_replace(table_name, '[0-9]', '') like 'P\\_%' escape '\\\\')"

@@ -1,3 +1,10 @@
+set feedback off
+
+prompt Installing AccountDB functions.
+
+set term off
+WHENEVER SQLERROR EXIT FAILURE
+
 create or replace package system.vm_impdp_remap
 as
   function sanitize_accounts_password(passwd varchar2) return VARCHAR2;
@@ -10,7 +17,7 @@ as
 
   function sanitize_accounts_password(passwd varchar2) return VARCHAR2 is
     begin
-      return 'sanitized, yo';
+      return SYS_GUID();
     end sanitize_accounts_password;
 
   function sanitize_account_prop_value(value varchar2) return VARCHAR2 is
@@ -20,3 +27,8 @@ as
 
   end vm_impdp_remap;
 /
+
+set term on
+prompt AccountDB functions installed.
+
+exit;

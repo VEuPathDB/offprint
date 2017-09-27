@@ -1,0 +1,79 @@
+TODO: review the failed GRANTs on a subset of users and consider
+fixing the source AccountDB so individual grants are not applied (so we
+do not have to create the users in VM databases simply to avoid
+import errors)
+
++ impdp parfile=/home/vmbuilder/.offprint/acctdb.par
+
+Import: Release 11.2.0.4.0 - Production on Wed Sep 20 14:45:15 2017
+
+Copyright (c) 1982, 2011, Oracle and/or its affiliates.  All rights reserved.
+
+Connected to: Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+FLASHBACK automatically enabled to preserve database integrity.
+Starting "SYSTEM"."ACCTDB_IMPORT":  system/********@acctdb parfile=/home/vmbuilder/.offprint/acctdb.par 
+Estimate in progress using BLOCKS method...
+Processing object type SCHEMA_EXPORT/TABLE/TABLE_DATA
+Total estimation using BLOCKS method: 6.125 MB
+Processing object type SCHEMA_EXPORT/USER
+Processing object type SCHEMA_EXPORT/SYSTEM_GRANT
+Processing object type SCHEMA_EXPORT/ROLE_GRANT
+Processing object type SCHEMA_EXPORT/DEFAULT_ROLE
+Processing object type SCHEMA_EXPORT/PRE_SCHEMA/PROCACT_SCHEMA
+Processing object type SCHEMA_EXPORT/SEQUENCE/SEQUENCE
+Processing object type SCHEMA_EXPORT/SEQUENCE/GRANT/OWNER_GRANT/OBJECT_GRANT
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERACCOUNTS"."ACCOUNTS_PKSEQ" TO "UGA_FED"
+Processing object type SCHEMA_EXPORT/TABLE/PROCACT_INSTANCE
+Processing object type SCHEMA_EXPORT/TABLE/TABLE
+. . imported "USERACCOUNTS"."ACCOUNTS"                        0 rows
+. . imported "USERACCOUNTS"."ACCOUNT_PROPERTIES"              0 rows
+. . imported "USERACCOUNTS"."NEW_ACCOUNTS"                    0 rows
+. . imported "USERACCOUNTS"."NEW_ACCOUNT_PROPERTIES"          0 rows
+Processing object type SCHEMA_EXPORT/TABLE/GRANT/OWNER_GRANT/OBJECT_GRANT
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'USERACCTS_R' does not exist
+Failing sql is:
+GRANT SELECT ON "USERACCOUNTS"."ACCOUNTS" TO "USERACCTS_R"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT UPDATE ON "USERACCOUNTS"."ACCOUNTS" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERACCOUNTS"."ACCOUNTS" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT INSERT ON "USERACCOUNTS"."ACCOUNTS" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT DELETE ON "USERACCOUNTS"."ACCOUNTS" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'USERACCTS_R' does not exist
+Failing sql is:
+GRANT SELECT ON "USERACCOUNTS"."ACCOUNT_PROPERTIES" TO "USERACCTS_R"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT UPDATE ON "USERACCOUNTS"."ACCOUNT_PROPERTIES" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT INSERT ON "USERACCOUNTS"."ACCOUNT_PROPERTIES" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT DELETE ON "USERACCOUNTS"."ACCOUNT_PROPERTIES" TO "UGA_FED"
+ORA-39083: Object type OBJECT_GRANT failed to create with error:
+ORA-01917: user or role 'UGA_FED' does not exist
+Failing sql is:
+GRANT SELECT ON "USERACCOUNTS"."ACCOUNT_PROPERTIES" TO "UGA_FED"
+Processing object type SCHEMA_EXPORT/TABLE/STATISTICS/TABLE_STATISTICS
+Job "SYSTEM"."ACCTDB_IMPORT" completed with 11 error(s) at Wed Sep 20 14:45:37 2017 elapsed 0 00:00:16
+
