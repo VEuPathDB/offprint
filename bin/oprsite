@@ -45,6 +45,7 @@ cd ~
 rm -f installWdkSite*.prop
 set +e; echo y | installWdkSite >/dev/null 2>&1; set -e;
 OWNER=joeuser iws-proper installWdkSite_*.prop $HOST ${WEBAPP#*.} www
+sed -i  's/^BASIC_AUTH_REQUIRED=.*/BASIC_AUTH_REQUIRED=false/' installWdkSite_*.prop
 
 echo y | installWdkSite installWdkSite_*.prop
 
