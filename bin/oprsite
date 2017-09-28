@@ -34,6 +34,7 @@ sudo /bin/sh -c "echo '127.0.0.1 ${HOST}' >> /etc/hosts" || errexit "Could not a
 sudo hostnamectl set-hostname $HOST --static || errexit "Could not set hostname to $HOST"
 
 sudo rm -rf "/var/www/${PRODUCT}/${WEBAPP}"
+sudo rm -f "/etc/httpd/conf/enabled_sites/${HOST}.conf"
 
 sudo mkdir -p "/var/www/${PRODUCT}"
 sudo chmod 0777 "/var/www/${PRODUCT}"
