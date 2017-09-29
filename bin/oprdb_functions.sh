@@ -168,7 +168,7 @@ function acctdb_export_queries {
   echo "${queries}"
 }
 
-function full_scrub_remap {
+function full_scrub_acctdb_remap {
   local account_schema=$1
   local remap='# scrub user profile data'
   while read line; do
@@ -176,12 +176,29 @@ function full_scrub_remap {
 
     local e
     eval e="${line}"
-    e="$(echo $e | sed "s/%%account_schema%%/${account_schema}/g")" || errexit "unable to set account_schema for full_scrub_map"
+    e="$(echo $e | sed "s/%%account_schema%%/${account_schema}/g")" || errexit "unable to set account_schema for full_scrub_acctdb_remap"
 
     local remap
-    remap="$(printf '%s\n%s' "${remap}" "$e")" || errexit "unable to set remap for full_scrub_remap"
+    remap="$(printf '%s\n%s' "${remap}" "$e")" || errexit "unable to set remap for full_scrub_acctdb_remap"
 
-  done < "${OPR_HOME}/conf/oprdb.fullscrub.remap"
+  done < "${OPR_HOME}/conf/oprdb.fullscrub.acctdb.remap"
+  echo "${remap}"
+}
+
+function full_scrub_userdb_remap {
+  local user_schema=$1
+  local remap='# scrub user profile data'
+  while read line; do
+    line=${line%%#*}  # strip comment (if any)
+
+    local e
+    eval e="${line}"
+    e="$(echo $e | sed "s/%%user_schema%%/${user_schema}/g")" || errexit "unable to set user_schema for full_scrub_userdb_remap"
+
+    local remap
+    remap="$(printf '%s\n%s' "${remap}" "$e")" || errexit "unable to set remap for full_scrub_userdb_remap"
+
+  done < "${OPR_HOME}/conf/oprdb.fullscrub.userdb.remap"
   echo "${remap}"
 }
 
@@ -314,6 +331,17 @@ function create_acctdb_functions {
   sqlplus -S -L "${dest_account}/${dest_passwd}@${dest_database}"  <<EOF
 WHENEVER OSERROR EXIT FAILURE
 @"${OPR_HOME}/lib/sql/oprdb.acctdb.functions.sql"
+EOF
+  [[ "$?" -eq "0" ]] || errexit "Unable to install AccountDB database functions."
+}
+
+function create_userdb_functions {
+  local dest_database="$1"
+  local dest_account="$2"
+  local dest_passwd="$3"
+  sqlplus -S -L "${dest_account}/${dest_passwd}@${dest_database}"  <<EOF
+WHENEVER OSERROR EXIT FAILURE
+@"${OPR_HOME}/lib/sql/oprdb.userdb.functions.sql"
 EOF
   [[ "$?" -eq "0" ]] || errexit "Unable to install AccountDB database functions."
 }
