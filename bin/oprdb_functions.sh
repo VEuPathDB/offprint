@@ -277,6 +277,9 @@ EOF
 }
 
 # AppDB to AccountDB
+# CREATE PUBLIC DATABASE LINK vm.acctdb 
+#    CONNECT TO acctdb_dblink IDENTIFIED BY &3
+#    USING 'acctdb';
 function create_acctdb_dblink {
   local dest_database="$1"
   local dest_account="$2"

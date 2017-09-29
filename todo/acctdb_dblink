@@ -1,0 +1,22 @@
+currently the offprint.conf needs the password
+for apicomm_dblink to match source
+
+CFG_WDK_ACCTDB_LINK_LOGIN=acctdb_dblink
+CFG_WDK_ACCTDB_LINK_PASSWORD=xxxxxx
+
+Instead, actually use the set values to create
+the user (does not have to be apicomm_dblink) with
+configured password.
+
+
+
+In AccountDB
+CREATE USER acctdb_dblink IDENTIFIED BY xxxx;
+GRANT CONNECT TO acctdb_dblink;
+GRANT USERACCTS_R TO acctdb_dblink;
+
+In AppDB
+CREATE PUBLIC DATABASE LINK vm.acctdb 
+   CONNECT TO acctdb_dblink IDENTIFIED BY xxxx
+   USING 'acctdb';
+

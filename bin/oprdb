@@ -272,6 +272,7 @@ EOF
 
 
   create_userdb_dblink ${DEST_APPDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_USERDB} ${CFG_WDK_USERDB_LINK_LOGIN} ${CFG_WDK_USERDB_LINK_PASSWORD} || errexit "unable to create_userdb_dblink"
+  create_acctdb_dblink ${DEST_APPDB} ${CFG_DEST_DB_SYS_LOGIN} ${CFG_DEST_DB_SYS_PASSWORD} ${DEST_ACCTDB} ${CFG_WDK_ACCTDB_LINK_LOGIN} ${CFG_WDK_ACCTDB_LINK_PASSWORD} || errexit "unable to create_acctdb_dblink"
   add_wdk_user ${DEST_APPDB} 'SYS' ${CFG_DEST_DB_SYS_PASSWORD} ${CFG_WDK_USER_LOGIN} ${CFG_WDK_USER_PASSWORD} || errexit "unable to add_wdk_user"
 
   set +e

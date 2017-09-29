@@ -34,6 +34,14 @@ CFG_WDK_USER_PASSWORD=xxxxxx
 CFG_WDK_USERDB_LINK_LOGIN=apicomm_dblink
 CFG_WDK_USERDB_LINK_PASSWORD=xxxxxx
 
+# Credentials for database link from AppDB to AcctDB
+# used by the WDK.
+#
+# These credentials will be created in the destination UserDB.
+#
+CFG_WDK_ACCTDB_LINK_LOGIN=acctdb_dblink
+CFG_WDK_ACCTDB_LINK_PASSWORD=xxxxxx
+
 # Login account with system privileges for UserDB and AppDB
 # databases. This account will do receive the import, create
 # user accounts.

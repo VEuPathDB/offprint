@@ -5,5 +5,5 @@ CFG_WDK_USERDB_LINK_LOGIN=apicomm_dblink
 CFG_WDK_USERDB_LINK_PASSWORD=xxx
 
 Instead, actually use the set values to create
-the user (does not have to apicomm_dblinke) with
+the user (does not have to be apicomm_dblink) with
 configured password.
