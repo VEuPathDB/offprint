@@ -1,0 +1,42 @@
+apicommN grants schema_owner so we get warnings when
+importing from it. apicommS does not use this role,
+so it must not be needed. Remove role from N.
+
+From import logs using N
+
+ORA-39083: Object type ROLE_GRANT failed to create with error:
+ORA-01919: role 'SCHEMA_OWNER' does not exist
+Failing sql is:
+ GRANT "SCHEMA_OWNER" TO "USERLOGINS5"
+ORA-39083: Object type ROLE_GRANT failed to create with error:
+ORA-01919: role 'SCHEMA_OWNER' does not exist
+Failing sql is:
+ GRANT "SCHEMA_OWNER" TO "WDKENGINE"
+ORA-39083: Object type ROLE_GRANT failed to create with error:
+ORA-01919: role 'SCHEMA_OWNER' does not exist
+Failing sql is:
+ GRANT "SCHEMA_OWNER" TO "UPLOADS"
+ORA-39083: Object type ROLE_GRANT failed to create with error:
+
+
+from apicommS
+
+SQL> select * from dba_role_privs where lower(grantee) = lower('wdkengine');
+
+GRANTEE 		       GRANTED_ROLE		      ADM DEF
+------------------------------ ------------------------------ --- ---
+WDKENGINE		       GUS_R			      NO  YES
+WDKENGINE		       GUS_W			      NO  YES
+WDKENGINE		       RESOURCE 		      NO  YES
+WDKENGINE		       CONNECT			      NO  YES
+
+from apicomN
+
+GRANTEE 		       GRANTED_ROLE		      ADM DEF
+------------------------------ ------------------------------ --- ---
+WDKENGINE		       GUS_R			      NO  YES
+WDKENGINE		       GUS_W			      NO  YES
+WDKENGINE		       RESOURCE 		      NO  YES
+WDKENGINE		       SCHEMA_OWNER		      NO  YES
+WDKENGINE		       CONNECT			      NO  YES
+
