@@ -1,8 +1,13 @@
 
-# only keep users that own comments
-query=%%user_schema%%.users:"WHERE is_guest != 1 and user_id in (select user_id from %%user_schema%%.comments@source_db)"
+# Only keep users that own comments
+# COMMENT_USERS has user_id, name, organization
+# links to COMMENTS by user_id
+query=%%user_schema%%.USERS:"WHERE is_guest != 1 and user_id in (select user_id from %%user_schema%%.comments@source_db)"
+query=%%user_schema%%.COMMENT_USERS:"WHERE user_id in (select user_id from %%user_schema%%.comments@source_db)"
 
-# retain all user comments data
+
+# retain all user comments data (COMMENTS includes email that should be
+# scrubbed by remap_data configured in oprdb.fullscrub.userdb.remap)
 query=%%user_schema%%.COMMENTS:"WHERE 1=1"
 query=%%user_schema%%.COMMENTFILE:"WHERE 1=1"
 query=%%user_schema%%.COMMENTREFERENCE:"WHERE 1=1"
@@ -16,6 +21,7 @@ query=%%user_schema%%.LOCATIONS:"WHERE 1=1"
 query=%%user_schema%%.REVIEW_STATUS:"WHERE 1=1"
 query=%%user_schema%%.TARGETCATEGORY:"WHERE 1=1"
 
+# internal WDK metadata
 query=%%user_schema%%.CONFIG:"WHERE 1=1"
 
 # return 0 rows for all other tables
