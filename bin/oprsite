@@ -70,5 +70,5 @@ sudo su - joeuser <<EOF
 source "/var/www/${PRODUCT}/${WEBAPP}/etc/setenv"
 cd \$PROJECT_HOME
 curl -sL "http://${SOURCE_WEBSITE}/dashboard/xml/svn/checkout/value" | /bin/sh
-rebuilder $HOST --use-conifer --non-interactive --skip-svn-update
+rebuilder $HOST --non-interactive --skip-svn-update
 EOF
