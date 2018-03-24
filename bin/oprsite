@@ -21,8 +21,11 @@ source "${OPR_CONF}" || { echo "${OPR_CONF} not found."; exit 1; }
 (startup_checks  "$@") || exit $?
 
 readonly SOURCE_WEBSITE=$1
+# optional destination website hostname.
+# defaults to sa.${domain} as reported by /dashboard vmenv API.
+readonly DEST_WEBSITE=$2 
 
-(write_env_dot_file "$SOURCE_WEBSITE" "$CFG_VMENV_FILE")
+(write_env_dot_file "$SOURCE_WEBSITE" "$CFG_VMENV_FILE" "$DEST_WEBSITE")
 
 source $CFG_VMENV_FILE 2>/dev/null || { stat=$?; echo "FATAL: ${CFG_VMENV_FILE} propfile appears invalid."; exit $stat; }
 
