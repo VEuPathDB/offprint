@@ -21,6 +21,7 @@ create role GUS_R;
 create role GUS_W;
 create role GUS_DBA;
 create role USERDB_LINK;
+create role COMM_WDK_W;
 
 -- reapply grants that are lost on network imports
-GRANT SELECT_CATALOG_ROLE TO GUS_R;
+GRANT SELECT_CATALOG_ROLE TO COMM_WDK_W;

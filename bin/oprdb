@@ -80,17 +80,18 @@ ACCOUNT_SCHEMA="$(account_schema_name $SOURCE_WEBSITE)" || errexit
 APPDB_LOGIN_SCHEMA="$(app_login_schema_name $SOURCE_WEBSITE)" || errexit
   readonly APPDB_LOGIN_SCHEMA
 
+HAS_COMMENT_SCHEMA="$(has_comment_schema $SOURCE_WEBSITE)"
+
 USERDB_SCHEMAS="$(userdb_schema_list "$USER_SCHEMA")" || errexit
   readonly USERDB_SCHEMAS
 ACCTDB_SCHEMAS="$(acctdb_schema_list "$ACCOUNT_SCHEMA")" || errexit
   readonly ACCOUNT_SCHEMA
-USERDB_EXP_QUERIES="$(userdb_export_queries "$USER_SCHEMA")" || errexit
+USERDB_EXP_QUERIES="$(userdb_export_queries "$USER_SCHEMA" "$HAS_COMMENT_SCHEMA")" || errexit
   readonly USERDB_EXP_QUERIES
 ACCTDB_EXP_QUERIES="$(acctdb_export_queries "$ACCOUNT_SCHEMA")" || errexit
   readonly ACCTDB_EXP_QUERIES
 FULL_SCRUB_ACCTDB_REMAP="$(full_scrub_acctdb_remap "$ACCOUNT_SCHEMA")" || errexit
   readonly FULL_SCRUB_ACCTDB_REMAP
-HAS_COMMENT_SCHEMA="$(has_comment_schema $SOURCE_WEBSITE)"
 FULL_SCRUB_USERDB_REMAP="$(full_scrub_userdb_remap "$USER_SCHEMA" "$HAS_COMMENT_SCHEMA")" || errexit
   readonly FULL_SCRUB_USERDB_REMAP
 APPDB_EXCLUDES="$(appdb_excludes_list)" || errexit

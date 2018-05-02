@@ -137,17 +137,29 @@ EOF
 
 function userdb_export_queries {
   local user_schema=$1
+  local has_comment_schema=$2
   local queries='# Queries for selective row exports.'
-  while read line; do
-    line=${line%%#*}  # strip comment (if any)
+  local query_files=("${OPR_HOME}/conf/oprdb.userdb.min.exp.query")
 
-    local e="${line}"
-    e="$(echo $e | sed "s/%%user_schema%%/${user_schema}/g")" || errexit "unable to set user_schema for userdb export queries in parfile"
+  if [[ $has_comment_schema -eq 0 ]]; then
+    query_files=("${remap_files[@]}" "${OPR_HOME}/conf/oprdb.comments.min.exp.query")
+  else
+    log "Skipping user comment tables import."
+  fi
 
-    local queries
-    queries="$(printf '%s\n%s' "${queries}" "$e")" || errexit "unable to set user export queries for parfile"
+  for f in "${query_files[@]}"; do
+    while read line; do
+      line=${line%%#*}  # strip comment (if any)
 
-  done < "${OPR_HOME}/conf/oprdb.userdb.min.exp.query"
+      local e="${line}"
+      e="$(echo $e | sed "s/%%user_schema%%/${user_schema}/g")" || errexit "unable to set user_schema for userdb export queries in parfile"
+
+      local queries
+      queries="$(printf '%s\n%s' "${queries}" "$e")" || errexit "unable to set user export queries for parfile"
+
+    done < "$f"
+  done
+
   echo "${queries}"
 }
 
@@ -203,6 +215,8 @@ function full_scrub_userdb_remap {
 
   if [[ $has_comment_schema -eq 0 ]]; then
     remap_files=("${remap_files[@]}" "${OPR_HOME}/conf/oprdb.fullscrub.comments.remap")
+  else
+    log "Skipping user comment tables remapping."
   fi
 
   for f in "${remap_files[@]}"; do

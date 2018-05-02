@@ -8,9 +8,7 @@ GRANT RESOURCE TO &&user;
 ALTER USER &&user DEFAULT ROLE ALL;
 ALTER USER &&user QUOTA UNLIMITED ON USERS;
 ALTER USER &&user QUOTA UNLIMITED ON GUS;
-GRANT GUS_R TO &&user;
-GRANT GUS_W to &&user;
-
+GRANT COMM_WDK_W TO &&user;
 
 -- ACL used by EuPathDB /dashboard to run
 --   select UTL_INADDR.get_host_name as server_name, UTL_INADDR.get_host_address as server_ip from dual;

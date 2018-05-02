@@ -18,7 +18,7 @@ function startup_checks {
     usage
     exit 1
   fi
-  
+
   if [[ ! -d "${OPR_HOME}" ]]; then
     errexit "${OPR_HOME} is not valid value for OPR_HOME."
   fi
