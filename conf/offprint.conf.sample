@@ -4,7 +4,7 @@
 #
 # OS user login on the source web server. This user will be used
 # to rsync data from the source web server to the virtual machine.
-# ssh key agent forwarding is required when logging into the virtual 
+# ssh key agent forwarding is required when logging into the virtual
 # machine so rsync can connect to the source web server.
 #
 RSYNC_USER=mheiges
@@ -58,6 +58,12 @@ CFG_DEST_DB_SYS_PASSWORD=xxxxx
 #
 CFG_OAUTH_CLIENT_SECRET=xxxx
 
+#
+# /dashboard API security token (/etc/httpd/conf.d/ebrc-dashboard.conf
+# /on source website)
+#
+DASHBOARD_API_TOKEN=xxxx-xxxx-xxxx-xxxx-xxxxxxx
+
 ##################################################################################
 #### Advanced - You probably do not want to change the following properties. #####
 ##################################################################################
@@ -81,7 +87,7 @@ CFG_DOWNLOAD_FILES_DIR=/var/www/Common/apiSiteFilesMirror/downloadSite
 # The destination directory will be created on the VM.
 CFG_WS_FILES_DIR=/var/www/Common/apiSiteFilesMirror/webServices
 
-# location of community data files (those uploaded by website users) 
+# location of community data files (those uploaded by website users)
 # on the source website.
 # The destination directory will be created on the VM.
 CFG_COMMUNITY_FILES_DIR=/var/www/Common/communityFilesMirror
@@ -93,4 +99,5 @@ CFG_DATAFILES_HOST=myrtle.gacrc.uga.edu
 # specific website hosted on the VM. e.g. $PRODUCT, $RELEASE_NUMBER
 CFG_VMENV_FILE=/etc/profile.d/eupath_vmenv.sh
 
-
+# options to pass to curl, typically for /dashboard requests
+CURL_OPTS=(-H "x-dashboard-security-token: ${DASHBOARD_API_TOKEN}")
