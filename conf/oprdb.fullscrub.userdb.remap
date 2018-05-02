@@ -1,2 +1,3 @@
-remap_data=%%user_schema%%.comments.email:system.vm_impdp_remap.sanitize_userlogins_email
-# Note userlogins5.mappedcomment has 'email' but is a View on userlogins5.comments
+# also see oprdb.fullscrub.comments.remap
+# for cleaning User Comments tables for sites that have these
+

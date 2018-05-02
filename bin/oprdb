@@ -90,7 +90,8 @@ ACCTDB_EXP_QUERIES="$(acctdb_export_queries "$ACCOUNT_SCHEMA")" || errexit
   readonly ACCTDB_EXP_QUERIES
 FULL_SCRUB_ACCTDB_REMAP="$(full_scrub_acctdb_remap "$ACCOUNT_SCHEMA")" || errexit
   readonly FULL_SCRUB_ACCTDB_REMAP
-FULL_SCRUB_USERDB_REMAP="$(full_scrub_userdb_remap "$USER_SCHEMA")" || errexit
+HAS_COMMENT_SCHEMA="$(has_comment_schema $SOURCE_WEBSITE)"
+FULL_SCRUB_USERDB_REMAP="$(full_scrub_userdb_remap "$USER_SCHEMA" "$HAS_COMMENT_SCHEMA")" || errexit
   readonly FULL_SCRUB_USERDB_REMAP
 APPDB_EXCLUDES="$(appdb_excludes_list)" || errexit
 

@@ -29,6 +29,16 @@ function enable_database_autostart {
     errexit "Unable to enable autostart in /etc/oratab"
 }
 
+# Not all sites have user comments schema in UserDB. Return 0 if present
+# in this site's configuration. If not present, as determined by matching
+# /dashboard output on spaces in an error message, return non-0
+function has_comment_schema {
+  local source_website="$1"
+  local url="http://${source_website}/dashboard/xml/wdk/commentconfig/commentschema/value"
+  curl "${CURL_OPTS[@]}" -L -f -s ${url} | grep -q -v  ' '
+  echo ${PIPESTATUS[1]}
+}
+
 # return first alias name found for database
 function source_db_alias {
   local source_website=$1
@@ -187,18 +197,28 @@ function full_scrub_acctdb_remap {
 
 function full_scrub_userdb_remap {
   local user_schema=$1
+  local has_comment_schema=$2
   local remap='# scrub user profile data'
-  while read line; do
-    line=${line%%#*}  # strip comment (if any)
+  local remap_files=("${OPR_HOME}/conf/oprdb.fullscrub.userdb.remap")
 
-    local e
-    eval e="${line}"
-    e="$(echo $e | sed "s/%%user_schema%%/${user_schema}/g")" || errexit "unable to set user_schema for full_scrub_userdb_remap"
+  if [[ $has_comment_schema -eq 0 ]]; then
+    remap_files=("${remap_files[@]}" "${OPR_HOME}/conf/oprdb.fullscrub.comments.remap")
+  fi
 
-    local remap
-    remap="$(printf '%s\n%s' "${remap}" "$e")" || errexit "unable to set remap for full_scrub_userdb_remap"
+  for f in "${remap_files[@]}"; do
+    while read line; do
+      line=${line%%#*}  # strip comment (if any)
 
-  done < "${OPR_HOME}/conf/oprdb.fullscrub.userdb.remap"
+      local e
+      eval e="${line}"
+      e="$(echo $e | sed "s/%%user_schema%%/${user_schema}/g")" || errexit "unable to set user_schema for full_scrub_userdb_remap"
+
+      local remap
+      remap="$(printf '%s\n%s' "${remap}" "$e")" || errexit "unable to set remap for full_scrub_userdb_remap"
+
+    done < "$f"
+  done
+
   echo "${remap}"
 }
 
@@ -207,7 +227,7 @@ function app_login_schema_name {
   local url="http://${source_website}/dashboard/xml/wdk/modelconfig/appdb/login/value"
 
   local app_login
-  app_login="$(curl -L -f -s ${url} | sed  's/\.$//')" \
+  app_login="$(curl "${CURL_OPTS[@]}" -L -f -s ${url} | sed  's/\.$//')" \
     || errexit "Unable to lookup database login from '${url}'."
 
   echo $app_login | tr '[:lower:]' '[:upper:]'
@@ -218,7 +238,7 @@ function user_schema_name {
   local url="http://${source_website}/dashboard/xml/wdk/modelconfig/userdb/userschema/value"
 
   local user_schema
-  user_schema="$(curl -L -f -s ${url} | sed  's/\.$//')" \
+  user_schema="$(curl "${CURL_OPTS[@]}" -L -f -s ${url} | sed  's/\.$//')" \
     || errexit "Unable to lookup WDK user schema from '${url}'."
 
   echo $user_schema | tr '[:lower:]' '[:upper:]'
@@ -230,7 +250,7 @@ function account_schema_name {
   local url="http://${source_website}/dashboard/xml/wdk/modelconfig/accountdb/accountschema/value"
 
   local account_schema
-  account_schema="$(curl -L -f -s ${url} | sed  's/\.$//')" \
+  account_schema="$(curl "${CURL_OPTS[@]}" -L -f -s ${url} | sed  's/\.$//')" \
     || errexit "Unable to lookup WDK account schema from '${url}'."
 
   echo $account_schema | tr '[:lower:]' '[:upper:]'
@@ -294,7 +314,7 @@ EOF
 }
 
 # AppDB to AccountDB
-# CREATE PUBLIC DATABASE LINK vm.acctdb 
+# CREATE PUBLIC DATABASE LINK vm.acctdb
 #    CONNECT TO acctdb_dblink IDENTIFIED BY &3
 #    USING 'acctdb';
 function create_acctdb_dblink {
