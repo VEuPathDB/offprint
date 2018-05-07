@@ -56,6 +56,7 @@ echo y | installWdkSite installWdkSite_*.prop
 # append to the setenv file that installWdkSite created
 sudo -u joeuser /bin/sh -c "cat >> '/var/www/$HOST/etc/setenv'" <<EOF
 export PRODUCT=$PRODUCT
+export PROJECT=$PROJECT
 export HOST=$HOST
 export WEBAPP=$WEBAPP
 export RELEASE_NUMBER=$RELEASE_NUMBER
@@ -68,6 +69,8 @@ EOF
 sudo systemctl reload httpd || errexit "Could not reload httpd service"
 
 sudo -u joeuser /bin/sh -c "cp '${OPR_HOME}/conf/conifer_site_vars.yml' '/var/www/${PRODUCT}/${WEBAPP}/etc/conifer_site_vars.yml'"
+# inject a project var and value into Conifer
+sudo -u joeuser /bin/sh -c "sed -i '/^# -- offprint edits --/a project: $PROJECT' '/var/www/${PRODUCT}/${WEBAPP}/etc/conifer_site_vars.yml'"
 
 sudo su - joeuser <<EOF
 source "/var/www/${PRODUCT}/${WEBAPP}/etc/setenv"

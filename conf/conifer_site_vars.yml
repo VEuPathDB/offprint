@@ -13,3 +13,5 @@ modelconfig_appDb_password: "{{ lookup('csvfile', 'appdb file=/etc/vm_db_creds.t
 modelconfig_userDb_connectionUrl: jdbc:oracle:oci:@userdb
 modelconfig_userDb_login:    "{{ lookup('csvfile', 'userdb file=/etc/vm_db_creds.tab col=1') }}"
 modelconfig_userDb_password: "{{ lookup('csvfile', 'userdb file=/etc/vm_db_creds.tab col=2') }}"
+
+# -- offprint edits --
