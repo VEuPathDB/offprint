@@ -8,6 +8,7 @@ this="$(basename $0)"
 Bin=$(dirname $(readlink -f $0))
 
 RSYNC_CMD() { rsync -az -e 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "$@"; }
+SSH_CMD() { ssh "$@"; }
 
 if [[ -f "${Bin}/oprdatafiles_functions.sh" ]]; then
   source "${Bin}/oprdatafiles_functions.sh"
@@ -29,16 +30,27 @@ readonly SOURCE_WEBSITE=$1
 # call it as needed so datafiles does not have a dependency on oprsite.
 source $CFG_VMENV_FILE 2>/dev/null || { stat=$?; echo "FATAL: ${CFG_VMENV_FILE} profile appears invalid."; exit $stat; }
 
-sudo mkdir -p "${CFG_DOWNLOAD_FILES_DIR}/${PRODUCT}"
-sudo chown "${UID}" "${CFG_DOWNLOAD_FILES_DIR}/${PRODUCT}"
-RSYNC_CMD --delete  "${RSYNC_USER}"@"${CFG_DATAFILES_HOST}":"${CFG_DOWNLOAD_FILES_DIR}/${PRODUCT}/release-${RELEASE_NUMBER}" "${CFG_DOWNLOAD_FILES_DIR}/${PRODUCT}/"
+if SSH_CMD "${RSYNC_USER}"@"${CFG_DATAFILES_HOST}" ls "${CFG_DOWNLOAD_FILES_DIR}/${PRODUCT}/release-${RELEASE_NUMBER}" 1>/dev/null 2>&1; then
+  sudo mkdir -p "${CFG_DOWNLOAD_FILES_DIR}/${PRODUCT}"
+  sudo chown "${UID}" "${CFG_DOWNLOAD_FILES_DIR}/${PRODUCT}"
+  RSYNC_CMD --delete  "${RSYNC_USER}"@"${CFG_DATAFILES_HOST}":"${CFG_DOWNLOAD_FILES_DIR}/${PRODUCT}/release-${RELEASE_NUMBER}" "${CFG_DOWNLOAD_FILES_DIR}/${PRODUCT}/"
+else
+  echo "$this :: download files not found, skipping"
+fi
 
-sudo mkdir -p "${CFG_WS_FILES_DIR}/${PRODUCT}"
-sudo chown "${UID}" "${CFG_WS_FILES_DIR}/${PRODUCT}"
-RSYNC_CMD --delete --exclude-from="${OPR_HOME}/conf/oprdatafiles.ws.rsync.exclude"  "${RSYNC_USER}"@"${CFG_DATAFILES_HOST}":"${CFG_WS_FILES_DIR}/${PRODUCT}/build-${BUILD_NUMBER}" "${CFG_WS_FILES_DIR}/$PRODUCT/"
+if SSH_CMD "${RSYNC_USER}"@"${CFG_DATAFILES_HOST}" ls "${CFG_WS_FILES_DIR}/${PRODUCT}" 1>/dev/null 2>&1; then
+  sudo mkdir -p "${CFG_WS_FILES_DIR}/${PRODUCT}"
+  sudo chown "${UID}" "${CFG_WS_FILES_DIR}/${PRODUCT}"
+  RSYNC_CMD --delete --exclude-from="${OPR_HOME}/conf/oprdatafiles.ws.rsync.exclude"  "${RSYNC_USER}"@"${CFG_DATAFILES_HOST}":"${CFG_WS_FILES_DIR}/${PRODUCT}/build-${BUILD_NUMBER}" "${CFG_WS_FILES_DIR}/$PRODUCT/"
+else
+  echo "$this :: webservice files not found at ${CFG_WS_FILES_DIR}/${PRODUCT}, skipping"
+fi
 
-sudo mkdir -p "${CFG_COMMUNITY_FILES_DIR}/${PRODUCT}"
-sudo chown "${UID}" "${CFG_COMMUNITY_FILES_DIR}/${PRODUCT}"
-RSYNC_CMD "${RSYNC_USER}"@"${CFG_DATAFILES_HOST}":"${CFG_COMMUNITY_FILES_DIR}/${PRODUCT}" "${CFG_COMMUNITY_FILES_DIR}"
-sudo chgrp -R tomcat "${CFG_COMMUNITY_FILES_DIR}/${PRODUCT}"
-sudo chmod -R g+rw,g+X  "${CFG_COMMUNITY_FILES_DIR}/${PRODUCT}/"
+if SSH_CMD "${RSYNC_USER}"@"${CFG_DATAFILES_HOST}" ls "${CFG_COMMUNITY_FILES_DIR}/${PRODUCT}" 1>/dev/null 2>&1; then
+  sudo mkdir -p "${CFG_COMMUNITY_FILES_DIR}/${PRODUCT}"
+  sudo chown "${UID}" "${CFG_COMMUNITY_FILES_DIR}/${PRODUCT}"
+  RSYNC_CMD "${RSYNC_USER}"@"${CFG_DATAFILES_HOST}":"${CFG_COMMUNITY_FILES_DIR}/${PRODUCT}" "${CFG_COMMUNITY_FILES_DIR}"
+  sudo chgrp -R tomcat "${CFG_COMMUNITY_FILES_DIR}/${PRODUCT}"
+  sudo chmod -R g+rw,g+X  "${CFG_COMMUNITY_FILES_DIR}/${PRODUCT}/"
+  echo "$this :: community files not found, skipping"
+fi
