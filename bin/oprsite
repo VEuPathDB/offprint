@@ -66,7 +66,17 @@ EOF
 #grep -q removePassword /etc/httpd/conf/enabled_sites/$HOST.conf || \
 #  sudo sed -i "s:</VirtualHost>:<Perl>\n  require 'conf/lib/Publish.pm';\n  removePassword();\n</Perl>\n\n</VirtualHost>:" /etc/httpd/conf/enabled_sites/$HOST.conf
 
-sudo systemctl reload httpd || errexit "Could not reload httpd service"
+if ! grep -q IS_PRIVATE_NETWORK=1 /etc/sysconfig/httpd; then
+sudo bash -c "cat >> /etc/sysconfig/httpd" <<EOF
+
+# websites that derive configurations from QaAuth.pm
+# can disable basic auth by setting IS_PRIVATE_NETWORK=1.
+IS_PRIVATE_NETWORK=1
+EOF
+fi
+
+# the /etc/sysconfig/httpd edit requires a full restart
+sudo systemctl restart httpd || errexit "Could not restart httpd service"
 
 sudo -u joeuser /bin/sh -c "cp '${OPR_HOME}/conf/conifer_site_vars.yml' '/var/www/${PRODUCT}/${WEBAPP}/etc/conifer_site_vars.yml'"
 # inject a project var and value into Conifer
