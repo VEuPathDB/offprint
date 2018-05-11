@@ -88,3 +88,5 @@ cd \$PROJECT_HOME
 curl -sL "http://${SOURCE_WEBSITE}/dashboard/xml/svn/checkout/value" | /bin/sh
 rebuilder $HOST --non-interactive --skip-svn-update
 EOF
+
+sudo "${Bin}/gencert.sh" "$HOST"
